@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base target="_self">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Full-Stack Data Analyst Platform</title>
+    <meta name="description" content="Enterprise data analyst platform with pitch books, financial graphs, EBITDA calculations, and statistical algorithms.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        :root {
+            --accent: #3b82f6;
+            --accent-dark: #1d4ed8;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --gradient-1: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        }
+        * { font-family: 'Inter', sans-serif; }
+        body { background: var(--bg-dark); color: var(--text-primary); }
+        .card-bg { background: var(--bg-card); }
+        .accent { color: var(--accent); }
+        .border-accent { border-color: var(--accent); }
+        .hover-glow:hover { box-shadow: 0 0 20px rgba(59,130,246,0.3); }
+        .glass { 
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .stat-card {
+            transition: all 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+        }
+        .chart-bar {
+            transition: height 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .pitch-card img {
+            transition: transform 0.5s ease;
+        }
+        .pitch-card:hover img {
+            transform: scale(1.05);
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+        .tab-active {
+            border-bottom: 2px solid #3b82f6;
+            color: #f1f5f9;
+        }
+    </style>
+</head>
+<body>
+    <header class="glass fixed w-full top-0 z-50 border-b border-slate-700/30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                        <i class="fas fa-chart-line text-white text-sm"></i>
+                    </div>
+                    <span class="text-xl font-bold gradient-text">DataPulse</span>
+                </div>
+                <nav class="hidden md:flex items-center space-x-8">
+                    <ul id="nav-list" class="flex items-center space-x-8"></ul>
+                </nav>
+                <div class="flex items-center space-x-4">
+                    <button class="text-slate-400 hover:text-white transition-colors">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    <button class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-sm font-medium transition-all hover-glow">
+                        <i class="fas fa-rocket mr-2"></i>Launch
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero -->
+        <section id="hero" class="pt-28 pb-16 md:pt-36 md:pb-24 relative overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-b from-blue-900/10 to-transparent pointer-events-none"></div>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+                <div class="text-center max-w-4xl mx-auto">
+                    <div class="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 rounded-full px-4 py-1.5 text-sm text-blue-400 mb-6">
+                        <i class="fas fa-sparkles text-xs"></i>
+                        Next-Gen Analytics Platform
+                    </div>
+                    <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-tight mb-6">
+                        <span class="gradient-text">Full-Stack</span> Data<br>Analyst Platform
+                    </h1>
+                    <p class="text-slate-300 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
+                        Enterprise-grade pitch books, real-time financial graphs, EBITDA calculations, 
+                        and statistical algorithms — all in one unified dashboard.
+                    </p>
+                    <div class="flex flex-wrap justify-center gap-4">
+                        <button class="bg-blue-600 hover:bg-blue-700 px-8 py-3.5 rounded-xl font-semibold transition-all hover-glow flex items-center gap-2">
+                            <i class="fas fa-file-alt"></i> View Pitch Books
+                        </button>
+                        <button class="bg-slate-700/50 hover:bg-slate-700 px-8 py-3.5 rounded-xl font-semibold transition-all border border-slate-600/50 flex items-center gap-2">
+                            <i class="fas fa-calculator"></i> Calculate EBITDA
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats Overview -->
+        <section id="stats" class="py-12 md:py-16">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6" id="stats-grid"></div>
+            </div>
+        </section>
+
+        <!-- Pitch Books -->
+        <section id="pitchbooks" class="py-16 md:py-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between mb-10">
+                    <div>
+                        <h2 class="text-3xl md:text-4xl font-bold">Pitch Books</h2>
+                        <p class="text-slate-400 mt-2">Investment-grade presentations and financial decks</p>
+                    </div>
+                    <button class="text-blue-400 hover:text-blue-300 text-sm flex items-center gap-1">
+                        View All <i class="fas fa-arrow-right text-xs"></i>
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" id="pitch-grid"></div>
+            </div>
+        </section>
+
+        <!-- Financial Graphs & EBITDA -->
+        <section id="financials" class="py-16 md:py-20 bg-slate-900/30">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between mb-10">
+                    <div>
+                        <h2 class="text-3xl md:text-4xl font-bold">Financial Graphs & <span class="gradient-text">EBITDA</span></h2>
+                        <p class="text-slate-400 mt-2">Real-time revenue, costs, and profitability metrics</p>
+                    </div>
+                    <div class="flex items-center gap-2 bg-slate-800/50 rounded-lg p-1">
+                        <button class="tab-btn px-3 py-1.5 text-sm rounded-md font-medium tab-active" data-tab="revenue">Revenue</button>
+                        <button class="tab-btn px-3 py-1.5 text-sm rounded-md text-slate-400 hover:text-white" data-tab="ebitda">EBITDA</button>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2 card-bg rounded-2xl p-6 border border-slate-700/30">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-lg font-semibold" id="chart-title">Quarterly Revenue (USD)</h3>
+                            <div class="flex items-center gap-4 text-sm text-slate-400">
+                                <span><i class="fas fa-circle text-green-400 text-xs"></i> Revenue</span>
+                                <span><i class="fas fa-circle text-blue-400 text-xs"></i> Costs</span>
+                            </div>
+                        </div>
+                        <div class="h-64 md:h-80 flex items-end gap-2 md:gap-4 relative" id="chart-bars"></div>
+                    </div>
+                    <div class="card-bg rounded-2xl p-6 border border-slate-700/30">
+                        <h3 class="text-lg font-semibold mb-4">EBITDA Calculator</h3>
+                        <div id="ebitda-calc" class="space-y-4"></div>
+                        <div id="ebitda-result" class="mt-6 p-4 rounded-xl bg-gradient-to-br from-blue-600/20 to-purple-600/20 border border-blue-500/20"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Statistical Algorithms -->
+        <section id="algorithms" class="py-16 md:py-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold">Statistical Algorithms</h2>
+                    <p class="text-slate-400 mt-2 max-w-xl mx-auto">Advanced statistical methods for data-driven decisions</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="algo-grid"></div>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <section class="py-16 md:py-20">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <div class="card-bg rounded-3xl p-10 md:p-16 border border-slate-700/30 relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-br from-blue-600/10 to-purple-600/5 pointer-events-none"></div>
+                    <h2 class="text-3xl md:text-4xl font-bold mb-4 relative">Ready to analyze like a pro?</h2>
+                    <p class="text-slate-300 text-lg mb-8 relative">Get full access to all pitch books, financial tools, and algorithms.</p>
+                    <button class="bg-blue-600 hover:bg-blue-700 px-8 py-3.5 rounded-xl font-semibold transition-all hover-glow inline-flex items-center gap-2 relative">
+                        <i class="fas fa-crown"></i> Start Free Trial
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="border-t border-slate-800 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                        <i class="fas fa-chart-line text-white text-xs"></i>
+                    </div>
+                    <span class="text-lg font-bold gradient-text">DataPulse</span>
+                </div>
+                <ul id="footer-links" class="flex flex-wrap justify-center gap-6 text-sm text-slate-400"></ul>
+                <p class="text-sm text-slate-500">&copy; 2025 DataPulse. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ─── DATA LAYER ───
+        const navItems = [
+            { label: "Pitch Books", href: "#pitchbooks" },
+            { label: "Financials", href: "#financials" },
+            { label: "Algorithms", href: "#algorithms" },
+            { label: "Docs", href: "#" }
+        ];
+
+        const stats = [
+            { icon: "fas fa-chart-pie", value: "1,247", label: "Pitch Books", color: "text-blue-400" },
+            { icon: "fas fa-dollar-sign", value: "$4.8B", label: "Total EV", color: "text-green-400" },
+            { icon: "fas fa-calculator", value: "98.6%", label: "Accuracy", color: "text-purple-400" },
+            { icon: "fas fa-database", value: "340+", label: "Algorithms", color: "text-amber-400" }
+        ];
+
+        const pitchBooks = [
+            { title: "Q1 2025 Equity Research", desc: "Deep dive into tech sector valuations and growth metrics.", img: "https://picsum.photos/600/400?random=1", tag: "Equity" },
+            { title: "M&A Target Analysis", desc: "Comprehensive merger & acquisition target screening.", img: "https://picsum.photos/600/400?random=2", tag: "M&A" },
+            { title: "Private Placement Memo", desc: "Confidential placement memorandum for Series C round.", img: "https://picsum.photos/600/400?random=3", tag: "Private" },
+            { title: "Sector Benchmarking", desc: "Peer performance comparison across SaaS metrics.", img: "https://picsum.photos/600/400?random=4", tag: "Benchmark" }
+        ];
+
+        const chartData = {
+            revenue: [
+                { quarter: "Q1", revenue: 42, cost: 28 },
+                { quarter: "Q2", revenue: 55, cost: 32 },
+                { quarter: "Q3", revenue: 68, cost: 36 },
+                { quarter: "Q4", revenue: 82, cost: 40 },
+                { quarter: "Q5", revenue: 97, cost: 45 },
+                { quarter: "Q6", revenue: 115, cost: 52 }
+            ],
+            ebitda: [
+                { quarter: "Q1", revenue: 42, cost: 28 },
+                { quarter: "Q2", revenue: 55, cost: 32 },
+                { quarter: "Q3", revenue: 68, cost: 36 },
+                { quarter: "Q4", revenue: 82, cost: 40 },
+                { quarter: "Q5", revenue: 97, cost: 45 },
+                { quarter: "Q6", revenue: 115, cost: 52 }
+            ]
+        };
+
+        const ebitdaInputs = [
+            { id: "rev", label: "Revenue (USD)", type: "number", placeholder: "e.g. 5000000", value: 5000000 },
+            { id: "cogs", label: "COGS", type: "number", placeholder: "e.g. 2000000", value: 2000000 },
+            { id: "sgna", label: "SG&A", type: "number", placeholder: "e.g. 800000", value: 800000 },
+            { id: "rd", label: "R&D", type: "number", placeholder: "e.g. 400000", value: 400000 },
+            { id: "da", label: "D&A", type: "number", placeholder: "e.g. 300000", value: 300000 }
+        ];
+
+        const algorithms = [
+            { 
+                title: "Linear Regression", 
+                icon: "fas fa-chart-line",
+                desc: "Predictive modeling for continuous variables using OLS estimation.",
+                complexity: "Intermediate",
+                color: "from-blue-500/20 to-blue-600/10",
+                border: "border-blue-500/30"
+            },
+            { 
+                title: "k-Means Clustering", 
+                icon: "fas fa-circle-nodes",
+                desc: "Unsupervised learning for segmenting datasets into k distinct groups.",
+                complexity: "Advanced",
+                color: "from-purple-500/20 to-purple-600/10",
+                border: "border-purple-500/30"
+            },
+            { 
+                title: "Monte Carlo Simulation", 
+                icon: "fas fa-shuffle",
+                desc: "Stochastic modeling for risk assessment and probabilistic forecasting.",
+                complexity: "Expert",
+                color: "from-amber-500/20 to-amber-600/10",
+                border: "border-amber-500/30"
+            },
+            { 
+                title: "ANOVA", 
+                icon: "fas fa-table",
+                desc: "Analysis of variance for comparing means across multiple groups.",
+                complexity: "Intermediate",
+                color: "from-green-500/20 to-green-600/10",
+                border: "border-green-500/30"
+            },
+            { 
+                title: "Time Series (ARIMA)", 
+                icon: "fas fa-wave-square",
+                desc: "Auto-regressive integrated moving average for temporal data forecasting.",
+                complexity: "Advanced",
+                color: "from-red-500/20 to-red-600/10",
+                border: "border-red-500/30"
+            },
+            { 
+                title: "PCA", 
+                icon: "fas fa-compress-arrows-alt",
+                desc: "Principal component analysis for dimensionality reduction.",
+                complexity: "Advanced",
+                color: "from-teal-500/20 to-teal-600/10",
+                border: "border-teal-500/30"
+            }
+        ];
+
+        const footerLinks = [
+            { label: "Privacy", href: "#" },
+            { label: "Terms", href: "#" },
+            { label: "Security", href: "#" },
+            { label: "Support", href: "#" }
+        ];
+
+        // ─── RENDER FUNCTIONS ───
+        function renderNav(items) {
+            return items.map(i => `<li><a href="${i.href}" class="text-slate-300 hover:text-white transition-colors text-sm font-medium">${i.label}</a></li>`).join("");
+        }
+
+        function renderStats(items) {
+            return items.map(s => `
+                <div class="stat-card card-bg rounded-2xl p-5 md:p-6 border border-slate-700/30">
+                    <div class="flex items-center gap-3 mb-3">
+                        <i class="${s.icon} ${s.color} text-xl"></i>
+                        <span class="text-2xl md:text-3xl font-bold">${s.value}</span>
+                    </div>
+                    <p class="text-slate-400 text-sm">${s.label}</p>
+                </div>
+            `).join("");
+        }
+
+        function renderPitchBooks(items) {
+            return items.map(p => `
+                <div class="pitch-card card-bg rounded-2xl overflow-hidden border border-slate-700/30 hover-glow transition-all cursor-pointer">
+                    <div class="relative overflow-hidden h-40">
+                        <img src="${p.img}" alt="${p.title}" loading="lazy" class="w-full h-full object-cover">
+                        <span class="absolute top-3 right-3 bg-blue-600/80 text-white text-xs px-2 py-1 rounded-md">${p.tag}</span>
+                    </div>
+                    <div class="p-5">
+                        <h3 class="font-semibold text-lg mb-1">${p.title}</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">${p.desc}</p>
+                        <button class="mt-4 text-blue-400 hover:text-blue-300 text-sm font-medium flex items-center gap-1">
+                            Download <i class="fas fa-download text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join("");
+        }
+
+        function renderChartBars(data, type) {
+            const maxVal = Math.max(...data.map(d => Math.max(d.revenue, d.cost))) * 1.15;
+            return data.map(d => {
+                const revH = (d.revenue / maxVal) * 100;
+                const costH = (d.cost / maxVal) * 100;
+                return `
+                    <div class="flex-1 flex flex-col items-end justify-end h-full">
+                        <div class="w-full flex flex-col items-center gap-1">
+                            <div class="w-full flex flex-col items-center justify-end" style="height: 180px;">
+                                <div class="w-full px-1 flex gap-1 items-end justify-center h-full">
+                                    <div class="chart-bar w-6 md:w-10 bg-green-400/80 rounded-t-md" style="height: ${revH}%;" title="Revenue: $${(d.revenue * 1000000).toLocaleString()}"></div>
+                                    <div class="chart-bar w-6 md:w-10 bg-blue-400/60 rounded-t-md" style="height: ${costH}%;" title="Costs: $${(d.cost * 1000000).toLocaleString()}"></div>
+                                </div>
+                            </div>
+                            <span class="text-xs text-slate-500 mt-2">${d.quarter}</span>
+                        </div>
+                    </div>
+                `;
+            }).join("");
+        }
+
+        function renderEBITDAInputs(items) {
+            return items.map(inp => `
+                <div>
+                    <label class="text-sm text-slate-300 mb-1 block">${inp.label}</label>
+                    <input type="${inp.type}" id="${inp.id}" value="${inp.value}" class="w-full bg-slate-800/50 border border-slate-600/50 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500 transition-colors">
+                </div>
+            `).join("");
+        }
+
+        function updateEBITDA() {
+            const rev = parseFloat(document.getElementById("rev").value) || 0;
+            const cogs = parseFloat(document.getElementById("cogs").value) || 0;
+            const sgna = parseFloat(document.getElementById("sgna").value) || 0;
+            const rd = parseFloat(document.getElementById("rd").value) || 0;
+            const da = parseFloat(document.getElementById("da").value) || 0;
+            
+            const grossProfit = rev - cogs;
+            const ebit = grossProfit - sgna - rd;
+            const ebitda = ebit + da;
+            const margin = rev > 0 ? (ebitda / rev) * 100 : 0;
+
+            document.getElementById("ebitda-result").innerHTML = `
+                <div class="space-y-2 text-sm">
+                    <div class="flex justify-between"><span class="text-slate-400">Gross Profit</span><span class="font-semibold">$${grossProfit.toLocaleString()}</span></div>
+                    <div class="flex justify-between"><span class="text-slate-400">EBIT</span><span class="font-semibold">$${ebit.toLocaleString()}</span></div>
+                    <div class="border-t border-slate-600/30 my-2"></div>
+                    <div class="flex justify-between text-lg"><span class="text-blue-400 font-semibold">EBITDA</span><span class="text-green-400 font-bold text-xl">$${ebitda.toLocaleString()}</span></div>
+                    <div class="flex justify-between"><span class="text-slate-400">EBITDA Margin</span><span class="font-semibold text-blue-400">${margin.toFixed(2)}%</span></div>
+                </div>
+            `;
+        }
+
+        function renderAlgorithms(items) {
+            return items.map(a => `
+                <div class="card-bg rounded-2xl p-6 border ${a.border} ${a.color} hover-glow transition-all cursor-pointer">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-xl bg-slate-800/80 flex items-center justify-center">
+                            <i class="${a.icon} text-blue-400"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold">${a.title}</h3>
+                            <span class="text-xs text-slate-500">${a.complexity}</span>
+                        </div>
+                    </div>
+                    <p class="text-slate-400 text-sm leading-relaxed">${a.desc}</p>
+                    <button class="mt-4 text-blue-400 hover:text-blue-300 text-sm flex items-center gap-1">
+                        <i class="fas fa-play-circle"></i> Run Analysis
+                    </button>
+                </div>
+            `).join("");
+        }
+
+        function renderFooter(items) {
+            return items.map(l => `<li><a href="${l.href}" class="hover:text-white transition-colors">${l.label}</a></li>`).join("");
+        }
+
+        // ─── MOUNT ───
+        document.getElementById("nav-list").innerHTML = renderNav(navItems);
+        document.getElementById("stats-grid").innerHTML = renderStats(stats);
+        document.getElementById("pitch-grid").innerHTML = renderPitchBooks(pitchBooks);
+        document.getElementById("chart-bars").innerHTML = renderChartBars(chartData.revenue, "revenue");
+        document.getElementById("ebitda-calc").innerHTML = renderEBITDAInputs(ebitdaInputs);
+        document.getElementById("algo-grid").innerHTML = renderAlgorithms(algorithms);
+        document.getElementById("footer-links").innerHTML = renderFooter(footerLinks);
+
+        // ─── EBITDA live update ───
+        document.querySelectorAll("#ebitda-calc input").forEach(inp => {
+            inp.addEventListener("input", updateEBITDA);
+        });
+        updateEBITDA();
+
+        // ─── EVENT DELEGATION ───
+        document.addEventListener("click", function(e) {
+            // Smooth scroll for nav links
+            const link = e.target.closest("a[href^='#']");
+            if (link && link.getAttribute("href") !== "#") {
+                e.preventDefault();
+                const target = document.querySelector(link.getAttribute("href"));
+                if (target) {
+                    target.scrollIntoView({ behavior: "smooth", block: "start" });
+                }
+            }
+
+            // Tab switching for chart
+            const tab = e.target.closest(".tab-btn");
+            if (tab) {
+                document.querySelectorAll(".tab-btn").forEach(t => {
+                    t.classList.remove("tab-active", "text-white");
+                    t.classList.add("text-slate-400");
+                });
+                tab.classList.add("tab-active");
+                tab.classList.remove("text-slate-400");
+                tab.classList.add("text-white");
+
+                const tabName = tab.dataset.tab;
+                const title = tabName === "revenue" ? "Quarterly Revenue (USD)" : "EBITDA Overview (USD)";
+                document.getElementById("chart-title").textContent = title;
+                document.getElementById("chart-bars").innerHTML = renderChartBars(chartData[tabName], tabName);
+            }
+
+            // Download pitch book
+            const downloadBtn = e.target.closest(".pitch-card button");
+            if (downloadBtn) {
+                e.preventDefault();
+                const title = downloadBtn.closest(".pitch-card").querySelector("h3").textContent;
+                alert(`Downloading \"${title}\" PDF...`);
+            }
+
+            // Run analysis
+            const runBtn = e.target.closest("[id='algo-grid'] button, #algo-grid button");
+            if (runBtn) {
+                e.preventDefault();
+                const title = runBtn.closest("div[class*='card-bg']").querySelector("h3").textContent;
+                alert(`Running \"${title}\" analysis... Results will be ready in a moment.`);
+            }
+
+            // CTA button
+            if (e.target.closest("button") && e.target.closest("button")?.textContent.includes("Start Free Trial")) {
+                e.preventDefault();
+                alert("Free trial started! Check your email for access.");
+            }
+
+            // Launch button
+            if (e.target.closest("button") && e.target.closest("button")?.textContent.includes("Launch")) {
+                e.preventDefault();
+                alert("Launching DataPulse platform...");
+            }
+
+            // View Pitch Books hero
+            if (e.target.closest("button") && e.target.closest("button")?.textContent.includes("View Pitch Books")) {
+                e.preventDefault();
+                document.getElementById("pitchbooks").scrollIntoView({ behavior: "smooth" });
+            }
+
+            // Calculate EBITDA hero
+            if (e.target.closest("button") && e.target.closest("button")?.textContent.includes("Calculate EBITDA")) {
+                e.preventDefault();
+                document.getElementById("financials").scrollIntoView({ behavior: "smooth" });
+            }
+        });
+    </script>
+</body>
+</html>
