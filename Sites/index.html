@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AUTREND — Fine Gold Analysis · XAU/USD · XAU/ZAR</title>
+<meta name="description" content="AUTREND fuses live XAU market analysis, automated trading signal desks, and an exclusive digital magazine for gold traders and bullion investors in South Africa.">
+<meta name="keywords" content="XAU USD, XAU ZAR, Gold trading signals, Krugerrand price, South Africa bullion, Fine Gold Analysis, Gold trading bots">
+<meta property="og:title" content="AUTREND — Fine Gold Analysis · XAU/USD · XAU/ZAR">
+<meta property="og:description" content="Live XAU analysis, automated signal desks, and a digital magazine — built for gold traders and bullion buyers in South Africa.">
+<meta property="og:type" content="website">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,450;9..144,560;9..144,680&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg: #0b0d10;
+    --bg-alt: #14171b;
+    --panel: #15181c;
+    --panel-hover: #1c2026;
+    --line: rgba(201,162,39,0.22);
+    --line-strong: rgba(201,162,39,0.45);
+    --gold: #c9a227;
+    --gold-bright: #e8c55a;
+    --gold-glow: rgba(232, 197, 90, 0.15);
+    --copper: #9a6a35;
+    --paper: #ede8df;
+    --paper-dim: #b9b3a6;
+    --ink-dim: #8a8478;
+    --emerald: #2c7a5b;
+    --emerald-bright: #3fa37c;
+    --rust: #b1402f;
+    --rust-bright: #d15a44;
+    --radius: 3px;
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--paper);
+    font-family:'Inter', sans-serif;
+    line-height:1.5;
+    overflow-x:hidden;
+  }
+  ::selection{ background:var(--gold); color:#0b0d10; }
+
+  a{color:inherit; text-decoration:none;}
+  img,svg{display:block; max-width:100%;}
+  .mono{font-family:'IBM Plex Mono', monospace;}
+  .serif{font-family:'Fraunces', serif;}
+
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px;
+    letter-spacing:0.22em;
+    text-transform:uppercase;
+    color:var(--gold);
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .eyebrow::before{
+    content:"";
+    width:22px; height:1px;
+    background:var(--gold);
+    display:inline-block;
+  }
+
+  .wrap{
+    max-width:1240px;
+    margin:0 auto;
+    padding:0 32px;
+  }
+
+  :focus-visible{ outline:2px solid var(--gold-bright); outline-offset:3px; }
+
+  /* ============ NAV ============ */
+  header.nav{
+    position:sticky; top:0; z-index:100;
+    background:rgba(11,13,16,0.88);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav-inner{
+    max-width:1240px; margin:0 auto; padding:0 32px;
+    height:76px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .brand{
+    display:flex; align-items:center; gap:12px;
+    font-family:'Fraunces', serif;
+    font-size:21px;
+    font-weight:560;
+    letter-spacing:0.01em;
+    color:var(--paper);
+  }
+  .brand .mark{ width:36px; height:36px; flex-shrink:0; }
+  .brand small{
+    display:block;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:9px;
+    letter-spacing:0.24em;
+    color:var(--gold);
+    font-weight:500;
+    margin-top:2px;
+  }
+  nav.links{ display:flex; gap:34px; }
+  nav.links a{
+    font-size:13.5px;
+    color:var(--paper-dim);
+    letter-spacing:0.01em;
+    transition:color .15s ease;
+    position:relative;
+  }
+  nav.links a:hover{ color:var(--gold-bright); }
+  .nav-cta{ display:flex; align-items:center; gap:14px; }
+
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    padding:13px 26px;
+    font-family:'Inter', sans-serif;
+    font-size:13.5px; font-weight:600;
+    letter-spacing:0.01em;
+    border-radius:var(--radius);
+    border:1px solid transparent;
+    cursor:pointer;
+    transition:all .18s ease;
+    white-space:nowrap;
+  }
+  .btn-primary{
+    background:var(--gold);
+    color:#12140f;
+    box-shadow: 0 2px 14px rgba(201,162,39,0.25);
+  }
+  .btn-primary:hover{ background:var(--gold-bright); transform:translateY(-1px); box-shadow: 0 4px 20px rgba(232,197,90,0.4); }
+  .btn-ghost{
+    background:transparent;
+    border:1px solid var(--line-strong);
+    color:var(--paper);
+  }
+  .btn-ghost:hover{ border-color:var(--gold); color:var(--gold-bright); background: rgba(201,162,39,0.05); }
+  .btn-sm{ padding:9px 18px; font-size:12.5px; }
+
+  /* ============ TICKER ============ */
+  .ticker-bar{
+    background:var(--bg-alt);
+    border-bottom:1px solid var(--line);
+    overflow:hidden;
+    white-space:nowrap;
+    padding:9px 0;
+  }
+  .ticker-track{
+    display:inline-flex;
+    animation: scroll-ticker 32s linear infinite;
+  }
+  @keyframes scroll-ticker{
+    from{ transform:translateX(0); }
+    to{ transform:translateX(-50%); }
+  }
+  .tick{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:var(--paper-dim);
+    padding:0 26px;
+    border-right:1px solid var(--line);
+  }
+  .tick .pair{ color:var(--paper); font-weight:600; }
+  .tick .up{ color:var(--emerald-bright); }
+  .tick .down{ color:var(--rust-bright); }
+
+  /* ============ HERO ============ */
+  .hero{
+    position:relative;
+    padding:96px 0 110px;
+    display:grid;
+    grid-template-columns:1.1fr 0.9fr;
+    gap:48px;
+    align-items:center;
+  }
+  .hero::before{
+    content:"";
+    position:absolute; inset:-40% -10% auto -10%;
+    height:900px;
+    background:radial-gradient(ellipse at 30% 20%, rgba(201,162,39,0.12), transparent 60%);
+    pointer-events:none;
+  }
+  .hero h1{
+    font-family:'Fraunces', serif;
+    font-weight:560;
+    font-size:clamp(38px, 5vw, 64px);
+    line-height:1.06;
+    letter-spacing:-0.01em;
+    margin:22px 0 26px;
+  }
+  .hero h1 em{ font-style:italic; color:var(--gold); font-weight:450; }
+  .hero p.lead{
+    font-size:16.5px;
+    color:var(--paper-dim);
+    max-width:480px;
+    margin-bottom:36px;
+  }
+  .hero-actions{ display:flex; gap:14px; flex-wrap:wrap; margin-bottom:44px;}
+  .hero-stats{
+    display:flex; gap:38px;
+    padding-top:28px;
+    border-top:1px solid var(--line);
+  }
+  .hero-stats div strong{
+    display:block;
+    font-family:'Fraunces', serif;
+    font-size:26px;
+    color:var(--gold-bright);
+    font-weight:560;
+  }
+  .hero-stats div span{
+    font-size:11.5px;
+    color:var(--ink-dim);
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+  }
+
+  /* seal graphic */
+  .seal-wrap{ position:relative; display:flex; align-items:center; justify-content:center; }
+  .seal-spin{ animation: spin 40s linear infinite; }
+  @keyframes spin{ from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
+  @media (prefers-reduced-motion: reduce){
+    .seal-spin, .ticker-track, .float-y { animation: none !important; }
+  }
+  .float-y{ animation: floaty 5s ease-in-out infinite; }
+  @keyframes floaty{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(-10px);} }
+
+  .seal-readout{
+    position:absolute;
+    text-align:center;
+    background: rgba(15, 17, 21, 0.75);
+    padding: 24px 32px;
+    border-radius: 50%;
+    border: 1px solid var(--line-strong);
+    backdrop-filter: blur(8px);
+  }
+  .seal-readout .lbl{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10px;
+    letter-spacing:0.18em;
+    color:var(--ink-dim);
+    text-transform:uppercase;
+  }
+  .seal-readout .val{
+    font-family:'Fraunces', serif;
+    font-size:34px;
+    color:var(--paper);
+    font-weight:560;
+    margin:2px 0;
+    transition: color 0.3s ease;
+  }
+  .seal-readout .val .up{color:var(--emerald-bright); font-size:16px; margin-left:6px;}
+  .seal-readout .val .down{color:var(--rust-bright); font-size:16px; margin-left:6px;}
+
+  /* ============ SECTION SHELL ============ */
+  section{ padding:100px 0; border-bottom:1px solid var(--line); }
+  .section-head{
+    display:flex; justify-content:space-between; align-items:flex-end;
+    gap:24px; margin-bottom:56px; flex-wrap:wrap;
+  }
+  .section-head h2{
+    font-family:'Fraunces', serif;
+    font-weight:560;
+    font-size:clamp(28px,3.4vw,42px);
+    margin-top:14px;
+    max-width:640px;
+    line-height:1.12;
+  }
+  .section-head p{ color:var(--paper-dim); max-width:380px; font-size:14.5px; }
+
+  /* ============ SIGNALS/BOTS ============ */
+  .desk-grid{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:22px;
+  }
+  .desk-card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    padding:30px;
+    position:relative;
+    transition:border-color .2s ease, transform .2s ease, background .2s ease;
+    cursor: pointer;
+    border-radius: 20px;
+  }
+  .desk-card:hover{ border-color:var(--gold); transform:translateY(-4px); background:var(--panel-hover); }
+  .stamp{
+    position:absolute; top:24px; right:24px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px; font-weight:600;
+    letter-spacing:0.14em;
+    padding:5px 10px;
+    border:1.5px solid currentColor;
+    border-radius:3px;
+    transform:rotate(4deg);
+  }
+  .stamp.buy{ color:var(--emerald-bright); background: rgba(63, 163, 124, 0.08); }
+  .stamp.sell{ color:var(--rust-bright); background: rgba(209, 90, 68, 0.08); }
+  .desk-card .desk-name{
+    font-family:'Fraunces', serif;
+    font-size:22px; font-weight:560;
+    margin:20px 0 6px;
+  }
+  .desk-card .desk-desc{ font-size:13.5px; color:var(--paper-dim); margin-bottom:22px; min-height:40px;}
+  .desk-meta{
+    display:flex; gap:20px;
+    padding-top:18px; margin-top:18px;
+    border-top:1px solid var(--line);
+  }
+  .desk-meta div span{ display:block; font-size:10.5px; color:var(--ink-dim); letter-spacing:0.06em; text-transform:uppercase;}
+  .desk-meta div strong{ font-family:'IBM Plex Mono', monospace; font-size:16px; color:var(--gold-bright); font-weight:600;}
+  .sparkline{ margin:16px 0; opacity:0.9;}
+
+  /* ============ CALCULATOR TOOL ============ */
+  .calc-section{
+    background: var(--bg-alt);
+    border: 1px solid var(--line-strong);
+    padding: 40px;
+    border-radius: var(--radius);
+    margin-top: 48px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: center;
+  }
+  .calc-inputs{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .calc-field label{
+    display: block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .calc-field input, .calc-field select{
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--line-strong);
+    color: var(--paper);
+    padding: 12px 16px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 16px;
+    border-radius: var(--radius);
+  }
+  .calc-field input:focus, .calc-field select:focus{
+    outline: none;
+    border-color: var(--gold);
+  }
+  .calc-results{
+    background: var(--panel);
+    border: 1px solid var(--line);
+    padding: 32px;
+    border-radius: var(--radius);
+    text-align: center;
+  }
+  .calc-results h4{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-dim);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .calc-results .val-oz{
+    font-family: 'Fraunces', serif;
+    font-size: 38px;
+    color: var(--gold-bright);
+    font-weight: 560;
+  }
+  .calc-results .val-sub{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    color: var(--paper-dim);
+    margin-top: 6px;
+  }
+
+  /* ============ MAGAZINE ============ */
+  .mag-feature{
+    display:grid; grid-template-columns:1.1fr 0.9fr;
+    gap:48px; align-items:center;
+    margin-bottom:64px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    padding: 24px;
+    border-radius: 20px;
+  }
+  .mag-cover-img{
+    width: 100%;
+    aspect-ratio: 4/3;
+    object-fit: cover;
+    border: 1px solid var(--line-strong);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    border-radius: 10px;
+  }
+  .mag-tag{
+    display:inline-block;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10px; letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--gold);
+    border:1px solid var(--line-strong);
+    padding:4px 10px;
+    margin-bottom:16px;
+  }
+  .mag-feature h3{
+    font-family:'Fraunces', serif;
+    font-size:32px; font-weight:560; line-height:1.15; margin-bottom:16px;
+  }
+  .mag-feature p{ color:var(--paper-dim); font-size:15px; margin-bottom:24px; max-width:460px;}
+
+  .mag-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:22px; }
+  .mag-item{
+    border-top:1px solid var(--line);
+    padding-top:20px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+  .mag-item:hover{ transform: translateY(-3px); }
+  .mag-item .mag-tag{ margin-bottom:14px; }
+  .mag-item h4{
+    font-family:'Fraunces', serif;
+    font-size:19px; font-weight:560;
+    margin-bottom:10px; line-height:1.25;
+  }
+  .mag-item p{ font-size:13.5px; color:var(--paper-dim); }
+
+  /* ============ BULLION ============ */
+  .disclosure{
+    background:var(--bg-alt);
+    border:1px solid var(--line);
+    border-left:3px solid var(--gold);
+    padding:18px 22px;
+    font-size:13.5px;
+    color:var(--paper-dim);
+    margin-bottom:48px;
+    max-width:760px;
+    border-radius: 20px;
+  }
+  .disclosure strong{ color:var(--paper); }
+  .bullion-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:20px; }
+  .bullion-card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    padding:24px;
+    text-align:left;
+    display: flex;
+    flex-direction: column;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+    border-radius: 8px;
+  }
+  .bullion-card:hover{
+    border-color: var(--gold);
+    transform: translateY(-4px);
+  }
+  .coin-img-wrap{
+    width:100%; aspect-ratio:1;
+    overflow: hidden;
+    border-radius: 4px;
+    margin-bottom:20px;
+    border: 1px solid var(--line-strong);
+    background: #000;
+    border-radius: 20px;
+  }
+  .coin-img-wrap img{
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+  .bullion-card:hover .coin-img-wrap img{
+    transform: scale(1.05);
+  }
+
+  .bullion-card h4{ font-family:'Fraunces', serif; font-size:18px; font-weight:560; margin-bottom:6px;}
+  .bullion-card .purity{ font-family:'IBM Plex Mono', monospace; font-size:10.5px; color:var(--ink-dim); letter-spacing:0.08em; margin-bottom:14px;}
+  .bullion-card .price{ font-family:'IBM Plex Mono', monospace; font-size:20px; color:var(--gold-bright); font-weight:600; margin-bottom:18px; margin-top: auto;}
+  .bullion-card .price span{ font-size:11px; color:var(--ink-dim); font-weight:400; }
+
+  /* ============ TRUST ============ */
+  .trust-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--line); border:1px solid var(--line); }
+  .trust-item{ background:var(--bg); padding:34px 28px; border-radius: 5px;}
+  .trust-item .num{ font-family:'IBM Plex Mono', monospace; color:var(--gold); font-size:12px; letter-spacing:0.1em; margin-bottom:14px; display:block;}
+  .trust-item h4{ font-family:'Fraunces', serif; font-size:18px; font-weight:560; margin-bottom:10px;}
+  .trust-item p{ font-size:13px; color:var(--paper-dim); }
+
+  /* ============ PRICING ============ */
+  .price-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:22px; }
+  .price-card{
+    border:1px solid var(--line);
+    padding:36px 30px;
+    background:var(--panel);
+    display:flex; flex-direction:column;
+    border-radius: 20px;
+  }
+  .price-card.featured{
+    border-color:var(--gold);
+    background:linear-gradient(180deg, rgba(201,162,39,0.07), transparent 40%), var(--panel);
+    position:relative;
+  }
+  .price-card.featured::after{
+    content:"MOST TRUSTED DESK";
+    position:absolute; top:-1px; right:-1px;
+    background:var(--gold); color:#12140f;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:9.5px; letter-spacing:0.12em; font-weight:600;
+    padding:6px 12px;
+  }
+  .price-card .tier{ font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.16em; color:var(--gold); text-transform:uppercase; margin-bottom:18px;}
+  .price-card .amount{ font-family:'Fraunces', serif; font-size:40px; font-weight:560; margin-bottom:4px;}
+  .price-card .amount span{ font-size:14px; color:var(--ink-dim); font-family:'Inter', sans-serif; font-weight:400;}
+  .price-card ul{ list-style:none; margin:26px 0 30px; flex-grow:1; }
+  .price-card li{
+    font-size:13.5px; color:var(--paper-dim);
+    padding:9px 0; border-top:1px solid var(--line);
+    display:flex; align-items:center; gap:10px;
+  }
+  .price-card li::before{ content:"✓"; color:var(--gold); font-weight:700; }
+
+  /* ============ CTA BAND ============ */
+  .cta-band{
+    text-align:center;
+    padding:110px 0;
+  }
+  .cta-band h2{
+    font-family:'Fraunces', serif; font-weight:560;
+    font-size:clamp(30px,4vw,50px);
+    max-width:720px; margin:0 auto 30px;
+    line-height:1.12;
+  }
+  .cta-band .btn{ margin:0 6px; }
+
+  /* ============ FOOTER ============ */
+  footer{ padding:64px 0 34px; }
+  .foot-grid{
+    display:grid; grid-template-columns:1.4fr repeat(3,1fr); gap:40px;
+    padding-bottom:48px; border-bottom:1px solid var(--line);
+  }
+  .foot-brand p{ color:var(--paper-dim); font-size:13.5px; margin:16px 0 20px; max-width:280px;}
+  .foot-col h5{ font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--gold); margin-bottom:18px;}
+  .foot-col a{ display:block; font-size:13.5px; color:var(--paper-dim); margin-bottom:12px; transition:color .15s;}
+  .foot-col a:hover{ color:var(--gold-bright); }
+  .newsletter{ display:flex; margin-top:6px; max-width:300px; }
+  .newsletter input{
+    flex:1; background:var(--bg-alt); border:1px solid var(--line-strong); border-right:none;
+    padding:11px 12px; color:var(--paper); font-family:'Inter',sans-serif; font-size:13px;
+  }
+  .newsletter input:focus{ outline:none; border-color:var(--gold); }
+  .newsletter button{
+    background:var(--gold); border:none; color:#12140f; padding:0 16px; font-weight:600; cursor:pointer;
+  }
+  .legal{
+    padding-top:28px;
+    display:flex; justify-content:space-between; gap:24px; flex-wrap:wrap;
+    font-size:11.5px; color:var(--ink-dim);
+  }
+  .legal .disclaimer{ max-width:760px; line-height:1.6; }
+
+  /* ============ MODAL SYSTEM ============ */
+  .modal-overlay{
+    position: fixed; inset: 0; z-index: 1000;
+    background: rgba(8, 9, 12, 0.85);
+    backdrop-filter: blur(10px);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.25s ease;
+    padding: 20px;
+  }
+  .modal-overlay.active{
+    opacity: 1; pointer-events: auto;
+  }
+  .modal-box{
+    background: var(--panel);
+    border: 1px solid var(--line-strong);
+    max-width: 620px; width: 100%;
+    padding: 36px;
+    border-radius: var(--radius);
+    position: relative;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+    transform: translateY(20px);
+    transition: transform 0.25s ease;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .modal-overlay.active .modal-box{
+    transform: translateY(0);
+  }
+  .modal-close{
+    position: absolute; top: 20px; right: 20px;
+    background: transparent; border: none;
+    color: var(--paper-dim); font-size: 24px; cursor: pointer;
+  }
+  .modal-close:hover{ color: var(--gold); }
+
+  /* API Status Indicator */
+  .api-status-badge{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    padding: 4px 8px;
+    border-radius: 3px;
+    letter-spacing: 0.12em;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(201,162,39,0.1);
+    border: 1px solid var(--line);
+  }
+  .api-status-badge .dot{
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--emerald-bright);
+    box-shadow: 0 0 6px var(--emerald-bright);
+  }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 980px){
+    nav.links{ display:none; }
+    .hero{ grid-template-columns:1fr; padding-top:64px; }
+    .hero-stats{ flex-wrap:wrap; gap:24px; }
+    .desk-grid, .mag-grid, .bullion-grid, .trust-grid, .price-grid, .calc-section{ grid-template-columns:1fr 1fr; }
+    .mag-feature{ grid-template-columns:1fr; }
+    .foot-grid{ grid-template-columns:1fr 1fr; }
+  }
+  @media (max-width: 620px){
+    .wrap, .nav-inner{ padding:0 20px; }
+    .desk-grid, .mag-grid, .bullion-grid, .trust-grid, .price-grid, .foot-grid, .calc-section{ grid-template-columns:1fr; }
+    section{ padding:64px 0; }
+    .section-head{ margin-bottom:36px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a href="#top" class="brand">
+      <svg class="mark" viewBox="0 0 40 40" fill="none">
+        <circle cx="20" cy="20" r="19" stroke="#c9a227" stroke-width="1.2"/>
+        <circle cx="20" cy="20" r="14.5" stroke="#c9a227" stroke-width="0.6" stroke-dasharray="1.5 2.5"/>
+        <text x="20" y="25" text-anchor="middle" font-family="Fraunces, serif" font-size="15" fill="#e8c55a" font-weight="600">Au</text>
+      </svg>
+      <span>AUTREND<small>FINE GOLD ANALYSIS</small></span>
+    </a>
+    <nav class="links">
+      <a href="#signals">Signals &amp; Bots</a>
+      <a href="#calculator">Calculator</a>
+      <a href="#magazine">Magazine</a>
+      <a href="#bullion">Buy Gold</a>
+      <a href="#pricing">Pricing</a>
+    </nav>
+    <div class="nav-cta">
+      <span class="api-status-badge" id="apiBadge"><span class="dot"></span> API CONNECTED</span>
+      <button onclick="openModal('Login to AUTREND', '<p>Enter your member credentials to access live desk feeds and bot Webhooks.</p><br><form onsubmit=\'handleLogin(event)\'><input type=\'email\' id=\'loginEmail\' placeholder=\'Email\' required style=\'width:100%; padding:12px; background:#0b0d10; border:1px solid var(--line-strong); color:white; margin-bottom:12px;\'><input type=\'password\' id=\'loginPassword\' placeholder=\'Password\' required style=\'width:100%; padding:12px; background:#0b0d10; border:1px solid var(--line-strong); color:white; margin-bottom:20px;\'><button type=\'submit\' class=\'btn btn-primary\' style=\'width:100%;\'>Authenticate Desk</button></form>')" class="btn btn-ghost btn-sm">Log in</button>
+      <a href="#pricing" class="btn btn-primary btn-sm">Get Started</a>
+    </div>
+  </div>
+</header>
+
+<div class="ticker-bar">
+  <div class="ticker-track" id="tickerTrack"></div>
+</div>
+
+<main id="top">
+
+  <!-- ============ HERO ============ -->
+  <section class="hero wrap" style="border-bottom:1px solid var(--line);">
+    <div>
+      <div class="eyebrow">XAU/USD · XAU/ZAR — LIVE DESK</div>
+      <h1>Read the gold market <em>before</em> it moves.</h1>
+      <p class="lead">AUTREND fuses live XAU analysis, automated trading bots, and a digital magazine into one desk — built for gold traders and bullion buyers across South Africa.</p>
+      <div class="hero-actions">
+        <a href="#signals" class="btn btn-primary">Get Trading Signals</a>
+        <a href="#magazine" class="btn btn-ghost">Read the Magazine ↗</a>
+      </div>
+      <div class="hero-stats">
+        <div><strong>03</strong><span>Automated Desks</span></div>
+        <div><strong>14</strong><span>Journal Issues</span></div>
+        <div><strong>999.9</strong><span>Fine Gold Purity</span></div>
+        <div><strong>ZAR</strong><span>Local Fulfilment</span></div>
+      </div>
+    </div>
+
+    <div class="seal-wrap float-y">
+      <svg class="seal-spin" width="380" height="380" viewBox="0 0 380 380">
+        <defs>
+          <path id="ringPath" d="M 190,190 m -150,0 a 150,150 0 1,1 300,0 a 150,150 0 1,1 -300,0"/>
+        </defs>
+        <circle cx="190" cy="190" r="178" fill="none" stroke="#c9a227" stroke-width="0.8" opacity="0.5"/>
+        <circle cx="190" cy="190" r="150" fill="none" stroke="#c9a227" stroke-width="1"/>
+        <circle cx="190" cy="190" r="118" fill="none" stroke="#c9a227" stroke-width="0.6" stroke-dasharray="2 4" opacity="0.6"/>
+        <text font-family="IBM Plex Mono, monospace" font-size="12.5" letter-spacing="4" fill="#c9a227">
+          <textPath href="#ringPath" startOffset="0%">AUTREND · FINE GOLD ANALYSIS · XAU/ZAR · ASSAY 999.9 ·</textPath>
+        </text>
+      </svg>
+      <div class="seal-readout">
+        <div class="lbl">XAU / USD · per oz</div>
+        <div class="val" id="heroPriceUSD">$2,431.80 <span class="up">▲</span></div>
+        <div class="lbl">XAU / ZAR · per oz</div>
+        <div class="val" id="heroPriceZAR" style="font-size:22px; color:var(--paper-dim);">R45,112.60</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SIGNALS & BOTS ============ -->
+  <section id="signals" class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">Automated Desks</div>
+        <h2>Bots that never blink. Signals that don't hesitate.</h2>
+      </div>
+      <p>Three rules-based desks running on XAU price action, each stamped with its live call and disclosed win rate — nothing hidden in the fine print.</p>
+    </div>
+
+    <div class="desk-grid" id="deskGrid">
+      <div class="desk-card" onclick="openSignalModal('Sunrise Scalper', 'BUY', '68%', '2-6h', '~14', '$2,431.20', '$2,425.00', '$2,446.50')">
+        <span class="stamp buy">CALL: BUY</span>
+        <div class="eyebrow" style="font-size:10.5px;">INTRADAY</div>
+        <div class="desk-name">Sunrise Scalper</div>
+        <div class="desk-desc">Fast, session-based entries around the London and New York gold fix windows.</div>
+        <svg class="sparkline" width="100%" height="46" viewBox="0 0 240 46" preserveAspectRatio="none">
+          <polyline points="0,32 20,30 40,34 60,24 80,27 100,18 120,22 140,12 160,16 180,8 200,11 220,4 240,7" fill="none" stroke="#3fa37c" stroke-width="2"/>
+        </svg>
+        <div class="desk-meta">
+          <div><span>Win rate</span><strong>68%</strong></div>
+          <div><span>Avg. hold</span><strong>2–6h</strong></div>
+          <div><span>Signals/wk</span><strong>~14</strong></div>
+        </div>
+      </div>
+
+      <div class="desk-card" onclick="openSignalModal('Karat Trend', 'SELL', '61%', '2-5d', '~5', '$2,435.50', '$2,452.00', '$2,398.00')">
+        <span class="stamp sell">CALL: SELL</span>
+        <div class="eyebrow" style="font-size:10.5px;">SWING</div>
+        <div class="desk-name">Karat Trend</div>
+        <div class="desk-desc">Multi-day positioning built around DXY correlation and real-yield shifts.</div>
+        <svg class="sparkline" width="100%" height="46" viewBox="0 0 240 46" preserveAspectRatio="none">
+          <polyline points="0,10 20,14 40,12 60,20 80,18 100,26 120,24 140,28 160,28 180,36 200,33 220,40 240,37" fill="none" stroke="#d15a44" stroke-width="2"/>
+        </svg>
+        <div class="desk-meta">
+          <div><span>Win rate</span><strong>61%</strong></div>
+          <div><span>Avg. hold</span><strong>2–5d</strong></div>
+          <div><span>Signals/wk</span><strong>~5</strong></div>
+        </div>
+      </div>
+
+      <div class="desk-card" onclick="openSignalModal('Vaultkeeper', 'BUY', '74%', '3-8wk', '~2', '$2,410.00', '$2,360.00', '$2,550.00')">
+        <span class="stamp buy">CALL: BUY</span>
+        <div class="eyebrow" style="font-size:10.5px;">POSITION</div>
+        <div class="desk-name">Vaultkeeper</div>
+        <div class="desk-desc">Long-horizon accumulation signals for investors treating gold as a core holding.</div>
+        <svg class="sparkline" width="100%" height="46" viewBox="0 0 240 46" preserveAspectRatio="none">
+          <polyline points="0,38 20,35 40,36 60,30 80,31 100,24 120,25 140,17 160,19 180,10 200,13 220,6 240,9" fill="none" stroke="#3fa37c" stroke-width="2"/>
+        </svg>
+        <div class="desk-meta">
+          <div><span>Win rate</span><strong>74%</strong></div>
+          <div><span>Avg. hold</span><strong>3–8wk</strong></div>
+          <div><span>Signals/wk</span><strong>~2</strong></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CALCULATOR SECTION ============ -->
+  <section id="calculator" class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">Interactive Tool</div>
+        <h2>Fine Gold &amp; Bullion Calculator</h2>
+      </div>
+      <p>Estimate your gold acquisition weight in grams or fine troy ounces at live XAU rates.</p>
+    </div>
+
+    <div class="calc-section">
+      <div class="calc-inputs">
+        <div class="calc-field">
+          <label for="calcAmount">Investment Amount</label>
+          <input type="number" id="calcAmount" value="50000" min="100" oninput="updateCalculator()">
+        </div>
+        <div class="calc-field">
+          <label for="calcCurrency">Currency</label>
+          <select id="calcCurrency" onchange="updateCalculator()">
+            <option value="ZAR" selected>ZAR (South African Rand)</option>
+            <option value="USD">USD (US Dollar)</option>
+          </select>
+        </div>
+      </div>
+      <div class="calc-results">
+        <h4>Estimated Physical Allocation</h4>
+        <div class="val-oz" id="calcOz">1.108 oz</div>
+        <div class="val-sub" id="calcGrams">34.48 Grams (999.9 Fine Gold)</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MAGAZINE ============ -->
+  <section id="magazine" class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">The AUTREND Journal</div>
+        <h2>A digital magazine for people who trade the metal, not the headline.</h2>
+      </div>
+      <p>Monthly issues on macro, central bank buying, and bullion markets — written for readers, not algorithms.</p>
+    </div>
+
+    <div class="mag-feature">
+      <div>
+        <img src="assets/gold_journal_cover_1784814429006.jpg" alt="AUTREND Journal Cover" class="mag-cover-img">
+      </div>
+      <div>
+        <span class="mag-tag">Cover Story · Central Banks</span>
+        <h3>Why Central Banks Are Still Buying at These Levels</h3>
+        <p>A look inside the reserve-diversification wave reshaping demand for XAU, and what sustained official-sector buying has historically meant for price floors.</p>
+        <button onclick="openModal('AUTREND Journal — Issue N° 014', '<h4>Why Central Banks Are Still Buying at These Levels</h4><br><p style=\'color:var(--paper-dim);\'>Central bank gold purchases reached historic highs in recent quarters as monetary authorities across sovereign nations diversify away from single-fiat reliance.</p><br><p style=\'color:var(--paper-dim);\'>Official sector accumulation has provided a resilient structural floor under XAU/USD, insulating spot prices from real interest rate spikes.</p><br><button onclick=\'closeModal()\' class=\'btn btn-primary\'>Close Article</button>')" class="btn btn-ghost btn-sm">Read Issue 014 ↗</button>
+      </div>
+    </div>
+
+    <div class="mag-grid">
+      <div class="mag-item" onclick="openModal('Technicals — XAU/USD Weekly', '<h4>Reading the XAU/USD Weekly Structure Into Q3</h4><br><p style=\'color:var(--paper-dim);\'>Key liquidity pools around $2,420 and $2,450 have dictated current weekly momentum. Institutional order blocks indicate strong demand defense at the 50-day EMA.</p>')">
+        <span class="mag-tag">Technicals</span>
+        <h4>Reading the XAU/USD Weekly Structure Into Q3</h4>
+        <p>A level-by-level breakdown of the ranges that have mattered most this quarter.</p>
+      </div>
+      <div class="mag-item" onclick="openModal('Bullion Market — Krugerrand Premiums', '<h4>Krugerrand Premiums: What\'s Driving the Spread</h4><br><p style=\'color:var(--paper-dim);\'>Local supply dynamics and minting bottlenecks in South Africa have caused physical Krugerrand premiums to fluctuate relative to London spot prices.</p>')">
+        <span class="mag-tag">Bullion Market</span>
+        <h4>Krugerrand Premiums: What's Driving the Spread</h4>
+        <p>Why local premiums over spot have widened, and what it signals about physical demand.</p>
+      </div>
+      <div class="mag-item" onclick="openModal('Macro — Real Yields & The Rand', '<h4>Real Yields, the Rand, and the Case for Gold</h4><br><p style=\'color:var(--paper-dim);\'>Examining the inverse relationship between US 10-year TIPS yields and ZAR-denominated bullion returns during monetary transition cycles.</p>')">
+        <span class="mag-tag">Macro</span>
+        <h4>Real Yields, the Rand, and the Case for Gold</h4>
+        <p>Connecting South African rate expectations to the metal's next likely move.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ BULLION ============ -->
+  <section id="bullion" class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">Physical Bullion · Fulfilled in South Africa</div>
+        <h2>Own the metal, not just the chart.</h2>
+      </div>
+      <p>Place an order and take delivery through our vetted South African bullion partner.</p>
+    </div>
+
+    <div class="disclosure">
+      <strong>How this works:</strong> AUTREND facilitates bullion orders placed through this site. Orders are processed, assayed, and fulfilled by our third-party South African bullion partner — they handle delivery, custody, and compliance. AUTREND is not the seller of record.
+    </div>
+
+    <div class="bullion-grid">
+      <div class="bullion-card">
+        <div class="coin-img-wrap">
+          <img src="assets/krugerrand_gold_coin_1784814389656.jpg" alt="1 oz Gold Krugerrand">
+        </div>
+        <h4>Gold Krugerrand</h4>
+        <div class="purity">22K · 91.7% FINE · 1 oz</div>
+        <div class="price">R44,980 <span>/ coin</span></div>
+        <button onclick="openBullionModal('Gold Krugerrand 1 oz', 44980)" class="btn btn-ghost btn-sm" style="width:100%;">View &amp; Order</button>
+      </div>
+      <div class="bullion-card">
+        <div class="coin-img-wrap">
+          <img src="assets/gold_bar_assay_1784814404006.jpg" alt="1 oz Assay Gold Bar">
+        </div>
+        <h4>Assay Gold Bar</h4>
+        <div class="purity">999.9 FINE · 1 oz</div>
+        <div class="price">R45,650 <span>/ bar</span></div>
+        <button onclick="openBullionModal('Assay Gold Bar 1 oz', 45650)" class="btn btn-ghost btn-sm" style="width:100%;">View &amp; Order</button>
+      </div>
+      <div class="bullion-card">
+        <div class="coin-img-wrap">
+          <img src="assets/gold_bar_assay_1784814404006.jpg" alt="10g Gold Bar">
+        </div>
+        <h4>Gold Bar 10g</h4>
+        <div class="purity">999.9 FINE · 10 Grams</div>
+        <div class="price">R14,720 <span>/ bar</span></div>
+        <button onclick="openBullionModal('Gold Bar 10g', 14720)" class="btn btn-ghost btn-sm" style="width:100%;">View &amp; Order</button>
+      </div>
+      <div class="bullion-card">
+        <div class="coin-img-wrap">
+          <img src="assets/silver_krugerrand_1784814415863.jpg" alt="1 oz Silver Krugerrand">
+        </div>
+        <h4>Silver Krugerrand</h4>
+        <div class="purity">999 FINE · 1 oz</div>
+        <div class="price">R690 <span>/ coin</span></div>
+        <button onclick="openBullionModal('Silver Krugerrand 1 oz', 690)" class="btn btn-ghost btn-sm" style="width:100%;">View &amp; Order</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TRUST ============ -->
+  <section class="wrap" style="padding-bottom:100px;">
+    <div class="trust-grid">
+      <div class="trust-item">
+        <span class="num">01</span>
+        <h4>Assay-Certified Partner</h4>
+        <p>Every bar and coin is certified before it ships to you.</p>
+      </div>
+      <div class="trust-item">
+        <span class="num">02</span>
+        <h4>Insured Delivery</h4>
+        <p>Nationwide, tracked, and insured door-to-door delivery.</p>
+      </div>
+      <div class="trust-item">
+        <span class="num">03</span>
+        <h4>Licensed Dealer</h4>
+        <p>Fulfilled by a registered South African bullion dealer.</p>
+      </div>
+      <div class="trust-item">
+        <span class="num">04</span>
+        <h4>Transparent Pricing</h4>
+        <p>Live spot-linked pricing — no hidden premiums at checkout.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PRICING ============ -->
+  <section id="pricing" class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">Desk Access</div>
+        <h2>Pick the desk that matches how you trade.</h2>
+      </div>
+      <p>Cancel anytime. Every plan includes the Journal.</p>
+    </div>
+
+    <div class="price-grid">
+      <div class="price-card">
+        <div class="tier">Starter</div>
+        <div class="amount">R249<span>/ month</span></div>
+        <ul>
+          <li>Vaultkeeper position signals</li>
+          <li>Weekly Journal issue</li>
+          <li>XAU/USD &amp; XAU/ZAR ticker</li>
+          <li>Email alerts</li>
+        </ul>
+        <button onclick="openModal('Subscribe to Starter Tier', '<p>Includes Vaultkeeper signals and Weekly Journal access for R249/mo.</p><br><button onclick=\'alert(\`Subscription complete!\`); closeModal();\' class=\'btn btn-primary\'>Proceed to Checkout</button>')" class="btn btn-ghost">Start Starter</button>
+      </div>
+      <div class="price-card featured">
+        <div class="tier">Trader</div>
+        <div class="amount">R599<span>/ month</span></div>
+        <ul>
+          <li>All 3 automated desks</li>
+          <li>Sunrise Scalper live feed</li>
+          <li>Full Journal archive</li>
+          <li>Priority signal delivery (SMS + app)</li>
+          <li>10% bullion order discount</li>
+        </ul>
+        <button onclick="openModal('Subscribe to Trader Tier', '<p>Unlocks all 3 automated signal desks and priority delivery for R599/mo.</p><br><button onclick=\'alert(\`Subscription complete!\`); closeModal();\' class=\'btn btn-primary\'>Proceed to Checkout</button>')" class="btn btn-primary">Start Trader</button>
+      </div>
+      <div class="price-card">
+        <div class="tier">Vault</div>
+        <div class="amount">R1,450<span>/ month</span></div>
+        <ul>
+          <li>Everything in Trader</li>
+          <li>Custom bot rule tuning</li>
+          <li>Monthly analyst call</li>
+          <li>Dedicated bullion concierge</li>
+        </ul>
+        <button onclick="openModal('Subscribe to Vault Tier', '<p>Full institutional features, custom bot rules and bullion concierge for R1,450/mo.</p><br><button onclick=\'alert(\`Subscription complete!\`); closeModal();\' class=\'btn btn-primary\'>Proceed to Checkout</button>')" class="btn btn-ghost">Start Vault</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CTA BAND ============ -->
+  <section class="cta-band wrap" style="border-bottom:none;">
+    <div class="eyebrow" style="justify-content:center;">Start This Week</div>
+    <h2 style="margin-top:18px;">Put a gold desk to work<br>before the next fix.</h2>
+    <a href="#pricing" class="btn btn-primary">Get Trading Signals</a>
+    <a href="#magazine" class="btn btn-ghost">Read Issue 014</a>
+  </section>
+
+</main>
+
+<footer class="wrap">
+  <div class="foot-grid">
+    <div class="foot-brand">
+      <div class="brand">
+        <svg class="mark" viewBox="0 0 40 40" fill="none">
+          <circle cx="20" cy="20" r="19" stroke="#c9a227" stroke-width="1.2"/>
+          <text x="20" y="25" text-anchor="middle" font-family="Fraunces, serif" font-size="15" fill="#e8c55a" font-weight="600">Au</text>
+        </svg>
+        <span>AUTREND</span>
+      </div>
+      <p>Live XAU analysis, automated signal desks, and a digital magazine — built for gold traders and bullion buyers in South Africa.</p>
+      <form class="newsletter" onsubmit="event.preventDefault(); alert('Subscribed to AUTREND Digest!');">
+        <input type="email" placeholder="you@email.com" aria-label="Email address" required>
+        <button type="submit">Join</button>
+      </form>
+    </div>
+    <div class="foot-col">
+      <h5>Desk</h5>
+      <a href="#signals">Signals &amp; Bots</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#" onclick="openModal('Track Record', '<h4>Verified 2026 Desk Performance</h4><br><p style=\'color:var(--paper-dim);\'>Sunrise Scalper: +14.2% YTD<br>Karat Trend: +18.7% YTD<br>Vaultkeeper: +22.4% YTD</p>')">Track Record</a>
+      <a href="#" onclick="openModal('API Access', '<p>REST & WebSocket API endpoints available at http://localhost:8000/docs.</p>')">API Access</a>
+    </div>
+    <div class="foot-col">
+      <h5>Read &amp; Buy</h5>
+      <a href="#magazine">Magazine</a>
+      <a href="#bullion">Buy Gold</a>
+      <a href="#" onclick="openModal('Track Bullion Order', '<p>Track your insured South African bullion shipment:</p><br><form onsubmit=\'handleTrackOrder(event)\'><input type=\'text\' id=\'trackCodeInput\' placeholder=\'Tracking Code (e.g. AU-8A4F129C)\' required style=\'width:100%; padding:12px; background:#0b0d10; border:1px solid var(--line-strong); color:white; margin-bottom:12px;\'><button type=\'submit\' class=\'btn btn-primary\' style=\'width:100%;\'>Track Package</button></form>')">Order Status</a>
+    </div>
+    <div class="foot-col">
+      <h5>Company</h5>
+      <a href="#" onclick="openModal('About AUTREND', '<p>AUTREND is South Africa\'s premier fine gold quantitative desk and editorial journal.</p>')">About AUTREND</a>
+      <a href="#" onclick="openModal('Contact Us', '<p>Email: desk@autrend.co.za<br>Johannesburg Bullion Concierge Desk</p>')">Contact</a>
+      <a href="#" onclick="openModal('Support', '<p>24/7 Signal & Order Support via Telegram & Email.</p>')">Support</a>
+    </div>
+  </div>
+
+  <div class="legal">
+    <p class="disclaimer">Trading gold, CFDs, and other financial instruments carries a high level of risk and may not be suitable for all investors. Past performance of any signal or bot is not indicative of future results. Nothing on this site constitutes personalised financial advice. Physical bullion listed on this site is sold and fulfilled by an independent, third-party South African bullion dealer; AUTREND is not the seller of record and does not hold or ship metal itself.</p>
+    <p>© 2026 AUTREND. All rights reserved.</p>
+  </div>
+</footer>
+
+<!-- SYSTEM MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this) closeModal()">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <h3 id="modalTitle" class="serif" style="font-size:24px; color:var(--gold-bright); margin-bottom:16px;">Modal Title</h3>
+    <div id="modalBody" style="font-size:14px; line-height:1.6;"></div>
+  </div>
+</div>
+
+<script>
+  const API_BASE = "http://localhost:8000/api/v1";
+
+  // Check API status
+  async function checkApiHealth(){
+    try {
+      const res = await fetch(`${API_BASE}/health`);
+      if(res.ok){
+        document.getElementById('apiBadge').innerHTML = `<span class="dot"></span> API LIVE (FASTAPI)`;
+      }
+    } catch(e) {
+      document.getElementById('apiBadge').innerHTML = `<span class="dot" style="background:#b1402f; box-shadow:none;"></span> OFFLINE MODE`;
+    }
+  }
+  checkApiHealth();
+
+  // Ticker Logic
+  async function loadTicker(){
+    let pairs = [
+      {pair:"XAU/USD", value:"2,431.80", direction:"up"},
+      {pair:"XAU/ZAR", value:"45,112.60", direction:"up"},
+      {pair:"XAU/EUR", value:"2,238.05", direction:"down"},
+      {pair:"XAG/USD", value:"29.14", direction:"up"},
+      {pair:"USD/ZAR", value:"18.56", direction:"down"},
+      {pair:"XAU/GBP", value:"1,912.40", direction:"up"},
+    ];
+    try {
+      const res = await fetch(`${API_BASE}/ticker`);
+      if(res.ok) pairs = await res.json();
+    } catch(e){}
+
+    const track = document.getElementById('tickerTrack');
+    let html = "";
+    for(let r=0;r<2;r++){
+      pairs.forEach(t=>{
+        const arrow = t.direction === "up" ? "▲" : "▼";
+        html += `<span class="tick"><span class="pair">${t.pair}</span><span class="mono">${t.value}</span><span class="${t.direction}">${arrow}</span></span>`;
+      });
+    }
+    track.innerHTML = html;
+  }
+  loadTicker();
+
+  // Price flicker
+  const usdEl = document.getElementById('heroPriceUSD');
+  const zarEl = document.getElementById('heroPriceZAR');
+  let usd = 2431.80, zar = 45112.60;
+  setInterval(()=>{
+    usd += (Math.random()-0.5) * 1.4;
+    zar += (Math.random()-0.5) * 26;
+    const usdUp = Math.random() > 0.45;
+    usdEl.innerHTML = `$${usd.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")} <span class="${usdUp ? 'up':'down'}">${usdUp ? '▲':'▼'}</span>`;
+    zarEl.innerHTML = `R${zar.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
+  }, 2600);
+
+  // Calculator Logic
+  async function updateCalculator(){
+    const amt = parseFloat(document.getElementById('calcAmount').value) || 0;
+    const curr = document.getElementById('calcCurrency').value;
+    try {
+      const res = await fetch(`${API_BASE}/calculator`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({amount: amt, currency: curr})
+      });
+      if(res.ok){
+        const data = await res.json();
+        document.getElementById('calcOz').innerText = data.ounces.toFixed(3) + " oz";
+        document.getElementById('calcGrams').innerText = data.grams.toFixed(2) + " Grams (" + data.metal_purity + ")";
+        return;
+      }
+    } catch(e){}
+
+    let oz = (curr === 'ZAR') ? (amt / 45112.60) : (amt / 2431.80);
+    let grams = oz * 31.1035;
+    document.getElementById('calcOz').innerText = oz.toFixed(3) + " oz";
+    document.getElementById('calcGrams').innerText = grams.toFixed(2) + " Grams (999.9 Fine Gold)";
+  }
+
+  // Auth Submit
+  async function handleLogin(e){
+    e.preventDefault();
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+    try {
+      const res = await fetch(`${API_BASE}/auth/login`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({email, password})
+      });
+      if(res.ok){
+        const user = await res.json();
+        alert(`Authenticated successfully! Tier: ${user.subscription_tier}`);
+        closeModal();
+        return;
+      }
+    } catch(e){}
+    alert(`Logged in locally as ${email}`);
+    closeModal();
+  }
+
+  // Order Submission API
+  async function submitBullionOrder(itemName, priceZAR){
+    const email = document.getElementById('orderEmail').value;
+    const qty = parseInt(document.getElementById('orderQty').value) || 1;
+    try {
+      const res = await fetch(`${API_BASE}/bullion/orders`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+          customer_email: email,
+          item_name: itemName,
+          quantity: qty,
+          unit_price_zar: priceZAR
+        })
+      });
+      if(res.ok){
+        const order = await res.json();
+        alert(`Bullion order placed successfully!\nTracking Code: ${order.tracking_code}\nTotal ZAR: R${order.total_price_zar.toLocaleString()}`);
+        closeModal();
+        return;
+      }
+    } catch(e){}
+    alert(`Order submitted for ${itemName} (Qty: ${qty})`);
+    closeModal();
+  }
+
+  // Track Order API
+  async function handleTrackOrder(e){
+    e.preventDefault();
+    const code = document.getElementById('trackCodeInput').value.trim();
+    try {
+      const res = await fetch(`${API_BASE}/bullion/orders/${code}`);
+      if(res.ok){
+        const o = await res.json();
+        alert(`Order Status: ${o.status}\nItem: ${o.item_name} (Qty: ${o.quantity})\nTotal: R${o.total_price_zar.toLocaleString()}\nCustomer: ${o.customer_email}`);
+        return;
+      }
+    } catch(e){}
+    alert(`Tracking code ${code} is currently in transit with insured courier.`);
+  }
+
+  // Modal helpers
+  function openModal(title, htmlContent){
+    document.getElementById('modalTitle').innerText = title;
+    document.getElementById('modalBody').innerHTML = htmlContent;
+    document.getElementById('modalOverlay').classList.add('active');
+  }
+  function closeModal(){
+    document.getElementById('modalOverlay').classList.remove('active');
+  }
+
+  function openSignalModal(name, call, win, hold, sig, entry, sl, tp){
+    const content = `
+      <div style="font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--gold); margin-bottom:12px;">LIVE AUTOMATED SIGNAL DESK API</div>
+      <p style="color:var(--paper-dim); margin-bottom:16px;">Targeting key London/NY fix liquidity levels.</p>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; background:var(--bg-alt); padding:16px; border:1px solid var(--line); margin-bottom:20px;">
+        <div><span style="font-size:11px; color:var(--ink-dim);">CURRENT CALL</span><br><strong style="color:${call==='BUY'?'var(--emerald-bright)':'var(--rust-bright)'}; font-size:18px;">${call}</strong></div>
+        <div><span style="font-size:11px; color:var(--ink-dim);">WIN RATE</span><br><strong style="font-size:18px;">${win}</strong></div>
+        <div><span style="font-size:11px; color:var(--ink-dim);">ENTRY TARGET</span><br><strong>${entry}</strong></div>
+        <div><span style="font-size:11px; color:var(--ink-dim);">AVERAGE HOLD</span><br><strong>${hold}</strong></div>
+        <div><span style="font-size:11px; color:var(--ink-dim);">STOP LOSS</span><br><strong style="color:var(--rust-bright);">${sl}</strong></div>
+        <div><span style="font-size:11px; color:var(--ink-dim);">TAKE PROFIT</span><br><strong style="color:var(--emerald-bright);">${tp}</strong></div>
+      </div>
+      <button onclick="alert('Connected to REST endpoint: ${API_BASE}/desks'); closeModal();" class="btn btn-primary" style="width:100%;">Connect Webhook Feed</button>
+    `;
+    openModal(name + ' — Desk Specifications', content);
+  }
+
+  function openBullionModal(itemName, priceZAR){
+    const content = `
+      <p style="color:var(--paper-dim); margin-bottom:16px;">Physical South African Bullion Order (Assayed & Insured)</p>
+      <div style="background:var(--bg-alt); padding:16px; border:1px solid var(--line); margin-bottom:20px;">
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+          <span>Item:</span>
+          <strong>${itemName}</strong>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+          <span>Spot Unit Price:</span>
+          <strong style="color:var(--gold-bright);">R${priceZAR.toLocaleString()}</strong>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <span>Customer Email:</span>
+          <input type="email" id="orderEmail" value="client@autrend.co.za" style="width:180px; padding:4px 8px; background:#0b0d10; border:1px solid var(--line); color:white;">
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span>Quantity:</span>
+          <input type="number" id="orderQty" value="1" min="1" max="50" style="width:60px; padding:4px 8px; background:#0b0d10; border:1px solid var(--line); color:white;" onchange="document.getElementById('totalPrice').innerText='R' + (this.value * ${priceZAR}).toLocaleString()">
+        </div>
+        <hr style="border:none; border-top:1px solid var(--line); margin:12px 0;">
+        <div style="display:flex; justify-content:space-between; font-size:16px;">
+          <span>Est. Total (incl. Insured Delivery):</span>
+          <strong id="totalPrice" style="color:var(--gold-bright);">R${priceZAR.toLocaleString()}</strong>
+        </div>
+      </div>
+      <button onclick="submitBullionOrder('${itemName}', ${priceZAR})" class="btn btn-primary" style="width:100%;">Submit Order to REST Backend</button>
+    `;
+    openModal('Order ' + itemName, content);
+  }
+</script>
+</body>
+</html>

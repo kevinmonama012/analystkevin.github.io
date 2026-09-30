@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prime Bytes Business Hub</title>
+<style>
+  :root{
+    --ink:#1E1B16; --bg:#F7F3EA; --card:#FFFFFF; --line:#E1D6BE;
+    --flame:#C6401F; --flame-dark:#8A2913; --char:#2B2B29;
+    --gold:#B5811E; --gold-dark:#7E5A12;
+    --forest:#2E5233; --forest-dark:#1C3520;
+    --muted:#6E6455; --input:#FDFBF6;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; font-family:-apple-system,Segoe UI,Arial,sans-serif; background:var(--bg); color:var(--ink);}
+  h1,h2,h3{font-family:Georgia,'Times New Roman',serif;}
+  .wrap{max-width:520px; margin:0 auto; padding-bottom:92px; min-height:100vh;}
+  header{padding:20px 16px 14px; border-bottom:1px solid var(--line); background:var(--char); color:#fff; position:sticky; top:0; z-index:6;}
+  header .title{font-family:Georgia,serif; font-weight:700; font-size:22px; color:#fff;}
+  header .tag{font-size:12px; color:#D9C7A8; margin-top:2px;}
+  main{padding:16px 16px 0;}
+  h2.section{font-size:20px; margin:0 0 3px;}
+  p.sub{font-size:13px; color:var(--muted); margin:0 0 12px;}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px; margin-bottom:12px;}
+  .card.dark{background:var(--char); border:none; color:#fff;}
+  .card.flame{background:var(--flame-dark); border:none; color:#fff;}
+  .card.forest{background:var(--forest-dark); border:none; color:#fff;}
+  .card.gold{background:var(--gold-dark); border:none; color:#fff;}
+  label.field{display:block; margin-bottom:10px;}
+  label.field span{font-size:11px; color:var(--muted); font-weight:600; display:block; margin-bottom:4px;}
+  input, select, textarea{width:100%; border:1px solid var(--line); border-radius:8px; padding:8px 9px; font-size:14px; color:var(--ink); background:var(--input); font-family:inherit;}
+  .row{display:flex; gap:8px; margin-bottom:8px; align-items:center;}
+  .row input, .row select{flex:1;}
+  .row input.narrow{flex:0 0 74px;}
+  .btn-remove{border:none; background:transparent; color:var(--flame); font-size:18px; cursor:pointer; padding:0 2px;}
+  .btn-add{width:100%; padding:9px 0; border:1px dashed var(--line); border-radius:8px; background:transparent; color:var(--gold-dark); font-weight:600; font-size:13px; cursor:pointer;}
+  .btn-add:hover{background:#F3E9D2;}
+  .btn-solid{width:100%; padding:10px 0; border:none; border-radius:8px; background:var(--flame); color:#fff; font-weight:700; font-size:14px; cursor:pointer;}
+  .stat-grid{display:flex; gap:10px; flex-wrap:wrap;}
+  .stat{flex:1; min-width:44%;}
+  .stat .lbl{font-size:10.5px; color:#8A7F6D; font-weight:700; text-transform:uppercase; letter-spacing:.4px;}
+  .stat .lbl.light{color:#D9C7A8;}
+  .stat .val{font-family:Georgia,serif; font-weight:700; font-size:20px; margin-top:2px;}
+  .stat .val.light{color:#fff;}
+  .tone-flame{color:#8A2913;}
+  .tone-forest{color:#1C3520;}
+  .pill-row{display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap;}
+  .pill{flex:1; min-width:70px; padding:8px 4px; border-radius:8px; border:1px solid var(--line); background:var(--input); color:var(--ink); font-weight:600; font-size:12.5px; cursor:pointer; text-align:center;}
+  .pill.active{background:var(--flame); border-color:var(--flame-dark); color:#fff;}
+  nav.tabs{position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid var(--line); display:flex; flex-wrap:wrap; max-width:520px; margin:0 auto; max-height:88px; overflow-y:auto;}
+  nav.tabs button{flex:1 0 20%; border:none; background:transparent; padding:9px 2px 8px; cursor:pointer; color:#9A8F7C; font-weight:500; font-size:10px; border-top:2px solid transparent;}
+  nav.tabs button.active{color:var(--flame-dark); font-weight:700; border-top:2px solid var(--flame);}
+  .tabpanel{display:none;}
+  .tabpanel.active{display:block;}
+  table.tbl{width:100%; border-collapse:collapse; font-size:12.5px;}
+  table.tbl th, table.tbl td{text-align:left; padding:6px 4px; border-bottom:1px solid var(--line);}
+  table.tbl th{color:var(--muted); font-weight:700; font-size:10.5px; text-transform:uppercase;}
+  .best{color:var(--forest-dark); font-weight:700;}
+  .worst{color:var(--flame-dark); font-weight:700;}
+  .badge{font-size:10.5px; background:#F1E4C6; color:var(--gold-dark); padding:2px 7px; border-radius:20px; font-weight:700;}
+  .badge.low{background:#F7DAD1; color:var(--flame-dark);}
+  .badge.ok{background:#DCEBDD; color:var(--forest-dark);}
+  .empty{font-size:13px; color:var(--muted); text-align:center; padding:16px 0;}
+  .product-card{border-left:4px solid var(--gold); padding-left:10px;}
+  .product-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;}
+  .product-head .name{font-weight:700; font-size:15px;}
+  .cat-heading{font-size:13px; text-transform:uppercase; letter-spacing:.5px; color:var(--gold-dark); font-weight:700; margin:18px 0 8px;}
+  .cat-heading:first-child{margin-top:0;}
+  .soon{opacity:.55;}
+  .ai-box textarea{min-height:60px; resize:vertical;}
+  .footer-note{font-size:11px; color:#AEA48F; text-align:center; padding:14px 16px 0;}
+  .kpi-row{display:flex; justify-content:space-between; font-size:12.5px; padding:7px 0; border-bottom:1px solid var(--line);}
+  .kpi-row:last-child{border-bottom:none;}
+  .kpi-target{color:var(--muted);}
+  .kpi-pass{color:var(--forest-dark); font-weight:700;}
+  .kpi-fail{color:var(--flame-dark); font-weight:700;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="title">Prime Bytes Business Hub</div>
+    <div class="tag">Every meal. Every rand. Every profit. &middot; Works fully offline</div>
+  </header>
+
+  <main>
+
+    <!-- DASHBOARD -->
+    <section class="tabpanel active" id="tab-dashboard">
+      <h2 class="section">Today at a glance</h2>
+      <p class="sub">Pulled from today's logged sales and current stock.</p>
+      <div class="card dark">
+        <div class="stat-grid">
+          <div class="stat"><div class="lbl light">Today's sales</div><div class="val light" id="dashRevenue">R0.00</div></div>
+          <div class="stat"><div class="lbl light">Today's profit</div><div class="val light" id="dashProfit">R0.00</div></div>
+          <div class="stat"><div class="lbl light">Orders completed</div><div class="val light" id="dashOrders">0</div></div>
+          <div class="stat"><div class="lbl light">Best seller</div><div class="val light" id="dashBestSeller" style="font-size:15px;">&mdash;</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="product-head"><span class="name" style="font-size:14px;">Stock alerts</span><span class="badge" id="stockAlertCount">0</span></div>
+        <div id="dashStockAlerts"></div>
+      </div>
+      <div class="card">
+        <div class="product-head"><span class="name" style="font-size:14px;">KPI targets</span></div>
+        <div id="kpiList"></div>
+      </div>
+    </section>
+
+    <!-- MENU COSTING -->
+    <section class="tabpanel" id="tab-menu">
+      <h2 class="section">Menu costing</h2>
+      <p class="sub">Every line item feeds cost price, selling price, and margin automatically.</p>
+      <div id="menuList"></div>
+      <div class="card">
+        <div class="row"><input id="newProdName" placeholder="New item name, e.g. Half Chicken"></div>
+        <div class="row">
+          <select id="newProdCat">
+            <option>Chicken</option><option>Ribs</option><option>Chips &amp; Fries</option>
+            <option>Kota</option><option>Burgers</option><option>Pita Pockets</option><option>Pizza (coming soon)</option>
+          </select>
+        </div>
+        <button class="btn-add" onclick="addProduct()">+ Add menu item</button>
+      </div>
+    </section>
+
+    <!-- INVENTORY -->
+    <section class="tabpanel" id="tab-inventory">
+      <h2 class="section">Inventory system</h2>
+      <p class="sub">Chicken, ribs, cheese, bacon, beef, potatoes, pita, buns &mdash; whatever you stock.</p>
+      <div id="inventoryList"></div>
+      <button class="btn-add" onclick="addInventoryItem()">+ Add stock item</button>
+    </section>
+
+    <!-- SUPPLIERS -->
+    <section class="tabpanel" id="tab-suppliers">
+      <h2 class="section">Supplier management</h2>
+      <p class="sub">Chicken, meat, bakery, and packaging suppliers &mdash; compare monthly.</p>
+      <div class="card">
+        <div class="row"><input id="supItem" placeholder="Item, e.g. Whole chicken (kg)"></div>
+        <div class="row">
+          <select id="supCategory">
+            <option>Chicken supplier</option><option>Meat supplier</option><option>Bakery supplier</option><option>Packaging supplier</option>
+          </select>
+        </div>
+        <div class="row">
+          <input id="supName" placeholder="Supplier name">
+          <input id="supPrice" class="narrow" type="number" inputmode="decimal" placeholder="Price">
+        </div>
+        <button class="btn-add" onclick="addSupplierEntry()">+ Add price</button>
+      </div>
+      <div id="supplierGroups"></div>
+    </section>
+
+    <!-- SALES -->
+    <section class="tabpanel" id="tab-sales">
+      <h2 class="section">Sales system</h2>
+      <p class="sub">Log every order to power the dashboard and analytics.</p>
+      <div class="card">
+        <div class="row">
+          <select id="saleProduct"></select>
+        </div>
+        <div class="row">
+          <input id="saleQty" type="number" inputmode="numeric" placeholder="Qty" value="1" class="narrow">
+          <input id="saleDate" type="date">
+        </div>
+        <button class="btn-solid" onclick="logSale()">Log sale</button>
+      </div>
+      <div class="card">
+        <table class="tbl">
+          <thead><tr><th>Date</th><th>Item</th><th>Qty</th><th>Revenue</th><th>Profit</th><th></th></tr></thead>
+          <tbody id="salesBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ANALYTICS -->
+    <section class="tabpanel" id="tab-analytics">
+      <h2 class="section">Prime Bytes analytics</h2>
+      <p class="sub">Based on every sale logged so far.</p>
+      <div class="card">
+        <div class="product-head"><span class="name" style="font-size:14px;">Top sellers (by units)</span></div>
+        <div id="topSellers"></div>
+      </div>
+      <div class="card">
+        <div class="product-head"><span class="name" style="font-size:14px;">Lowest margin products</span></div>
+        <div id="lowMargin"></div>
+      </div>
+      <div class="card">
+        <div class="product-head"><span class="name" style="font-size:14px;">Highest profit products</span></div>
+        <div id="highProfit"></div>
+      </div>
+    </section>
+
+    <!-- MARKETING -->
+    <section class="tabpanel" id="tab-marketing">
+      <h2 class="section">Marketing module</h2>
+      <p class="sub">Track reach and see which promotions move sales.</p>
+      <div class="card">
+        <div class="row">
+          <select id="mkChannel">
+            <option>TikTok views</option><option>Facebook engagement</option><option>WhatsApp orders</option><option>Google reviews</option>
+          </select>
+        </div>
+        <div class="row">
+          <input id="mkDate" type="date">
+          <input id="mkValue" type="number" inputmode="numeric" placeholder="Count/value" class="narrow">
+        </div>
+        <input id="mkNote" placeholder="Note, e.g. Friday kota promo" style="margin-bottom:8px;">
+        <button class="btn-add" onclick="addMarketing()">+ Log entry</button>
+      </div>
+      <div class="card">
+        <table class="tbl">
+          <thead><tr><th>Date</th><th>Channel</th><th>Value</th><th>Note</th><th></th></tr></thead>
+          <tbody id="marketingBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- AI ASSISTANT -->
+    <section class="tabpanel" id="tab-ai">
+      <h2 class="section">Business assistant</h2>
+      <p class="sub">Offline, rule-based answers from your own logged data &mdash; not a live AI.</p>
+      <div class="card ai-box">
+        <label class="field"><span>Ask about your business</span>
+          <textarea id="aiInput" placeholder="How many chicken pitas must I sell to reach R50,000 revenue?"></textarea>
+        </label>
+        <div class="pill-row">
+          <button class="pill" onclick="askPreset('profit')">Most profitable</button>
+          <button class="pill" onclick="askPreset('ingredient')">Costly ingredient</button>
+          <button class="pill" onclick="askPreset('price')">Raise prices on</button>
+        </div>
+        <button class="btn-solid" onclick="runAsk()">Ask</button>
+        <div id="aiResult" style="margin-top:12px;"></div>
+      </div>
+    </section>
+
+    <p class="footer-note">All data is saved on this computer only, in this browser. Nothing is sent to the internet.</p>
+  </main>
+</div>
+
+<nav class="tabs">
+  <button class="active" data-tab="dashboard" onclick="showTab('dashboard')">Dashboard</button>
+  <button data-tab="menu" onclick="showTab('menu')">Menu</button>
+  <button data-tab="inventory" onclick="showTab('inventory')">Stock</button>
+  <button data-tab="suppliers" onclick="showTab('suppliers')">Suppliers</button>
+  <button data-tab="sales" onclick="showTab('sales')">Sales</button>
+  <button data-tab="analytics" onclick="showTab('analytics')">Analytics</button>
+  <button data-tab="marketing" onclick="showTab('marketing')">Marketing</button>
+  <button data-tab="ai" onclick="showTab('ai')">Assistant</button>
+</nav>
+
+<script>
+const STORE_KEY = "primeBytesHub_v1";
+let idSeq = 1;
+const newId = () => idSeq++;
+function num(v){ const n = parseFloat(v); return Number.isFinite(n) ? n : 0; }
+function fmt(n){ n = Number.isFinite(n) ? n : 0; return "R" + n.toFixed(2); }
+function todayStr(){ return new Date().toISOString().slice(0,10); }
+function escapeHtml(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function defaultProduct(cat, name, lines, price){
+  return { id:newId(), category:cat, name, lines, sellingPrice:price };
+}
+
+let state = null;
+try{ const raw = localStorage.getItem(STORE_KEY); if(raw) state = JSON.parse(raw); }catch(e){}
+
+if(!state){
+  state = {
+    products: [
+      defaultProduct("Chicken","Full Chicken", [
+        {n:"Chicken cost",c:"75"},{n:"Spice cost",c:"6"},{n:"Packaging cost",c:"4"},{n:"Electricity/gas cost",c:"5"}
+      ], "145"),
+      defaultProduct("Chicken","Half Chicken", [
+        {n:"Chicken cost",c:"38"},{n:"Spice cost",c:"3"},{n:"Packaging cost",c:"3"},{n:"Electricity/gas cost",c:"3"}
+      ], "80"),
+      defaultProduct("Chicken","Quarter Chicken", [
+        {n:"Chicken cost",c:"20"},{n:"Spice cost",c:"2"},{n:"Packaging cost",c:"2"},{n:"Electricity/gas cost",c:"2"}
+      ], "45"),
+      defaultProduct("Ribs","Ribs", [
+        {n:"Raw rib weight cost",c:"42"},{n:"Marinade cost",c:"8"},{n:"Sauce cost",c:"5"},{n:"Packaging",c:"3"}
+      ], "110"),
+      defaultProduct("Chips & Fries","Chips (small)", [
+        {n:"Potato cost",c:"5"},{n:"Oil cost",c:"2"},{n:"Seasoning cost",c:"0.5"},{n:"Packaging",c:"1.5"}
+      ], "20"),
+      defaultProduct("Chips & Fries","Chips (medium)", [
+        {n:"Potato cost",c:"8"},{n:"Oil cost",c:"3"},{n:"Seasoning cost",c:"0.8"},{n:"Packaging",c:"1.7"}
+      ], "30"),
+      defaultProduct("Chips & Fries","Chips (large)", [
+        {n:"Potato cost",c:"11"},{n:"Oil cost",c:"4"},{n:"Seasoning cost",c:"1"},{n:"Packaging",c:"2"}
+      ], "40"),
+      defaultProduct("Kota","Kota", [
+        {n:"Bread",c:"6"},{n:"Chips",c:"5"},{n:"Polony",c:"4"},{n:"Russian",c:"7"},{n:"Cheese",c:"5"},{n:"Sauce",c:"2"}
+      ], "45"),
+      defaultProduct("Burgers","Cheeseburger", [
+        {n:"Bun",c:"4"},{n:"Patty",c:"14"},{n:"Cheese",c:"4"},{n:"Sauce",c:"2"},{n:"Packaging",c:"2"}
+      ], "48"),
+      defaultProduct("Burgers","Double Cheeseburger", [
+        {n:"Bun",c:"4"},{n:"2 patties",c:"28"},{n:"2 cheese slices",c:"8"},{n:"Sauce",c:"2"},{n:"Packaging",c:"2"}
+      ], "72"),
+      defaultProduct("Burgers","Bacon Burger", [
+        {n:"Bun",c:"4"},{n:"Patty",c:"14"},{n:"Bacon",c:"9"},{n:"Cheese",c:"4"},{n:"Sauce",c:"2"}
+      ], "58"),
+      defaultProduct("Pita Pockets","Chicken Pita", [
+        {n:"Chicken",c:"18"},{n:"Pita bread",c:"5"},{n:"Sauce",c:"2"}
+      ], "45"),
+      defaultProduct("Pita Pockets","Beef Pita", [
+        {n:"Beef strips",c:"22"},{n:"Pita bread",c:"5"},{n:"Sauce",c:"2"}
+      ], "50"),
+      defaultProduct("Pita Pockets","Bacon Pita", [
+        {n:"Pita bread",c:"5"},{n:"Bacon",c:"12"},{n:"Sauce",c:"2"},{n:"Vegetables",c:"3"}
+      ], "48"),
+      { id:newId(), category:"Pizza (coming soon)", name:"Margherita", lines:[{n:"Dough",c:"8"},{n:"Cheese",c:"10"},{n:"Sauce",c:"3"}], sellingPrice:"0", soon:true },
+    ],
+    inventory: [
+      { id:newId(), name:"Chicken", qty:"30", unit:"kg", low:"10" },
+      { id:newId(), name:"Cheese", qty:"4", unit:"kg", low:"3" },
+      { id:newId(), name:"Bacon", qty:"2", unit:"kg", low:"2" },
+    ],
+    suppliers: [
+      { id:newId(), category:"Chicken supplier", item:"Whole chicken (kg)", name:"County Fair direct", price:"38" },
+    ],
+    sales: [],
+    marketing: [],
+  };
+}
+[...state.products, ...state.inventory, ...state.suppliers, ...state.sales, ...state.marketing].forEach(o=>{ if(o && o.id>=idSeq) idSeq=o.id+1; });
+state.products.forEach(p=>{ if(!Array.isArray(p.lines)) p.lines=[]; });
+
+function saveState(){ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
+
+function showTab(name){
+  document.querySelectorAll('.tabpanel').forEach(el=>el.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.toggle('active', b.dataset.tab===name));
+  if(name==='sales'){ populateSaleProductSelect(); }
+}
+
+/* ---------- product cost helpers ---------- */
+function productCost(p){ return p.lines.reduce((s,l)=>s+num(l.c),0); }
+function productProfit(p){ return num(p.sellingPrice) - productCost(p); }
+function productMarginPct(p){ const sp=num(p.sellingPrice); return sp>0 ? (productProfit(p)/sp)*100 : 0; }
+
+/* ---------- menu costing ---------- */
+function renderMenu(){
+  const list = document.getElementById('menuList');
+  list.innerHTML = "";
+  const cats = [...new Set(state.products.map(p=>p.category))];
+  cats.forEach(cat=>{
+    const h = document.createElement('div');
+    h.className = 'cat-heading';
+    h.textContent = cat;
+    list.appendChild(h);
+    state.products.filter(p=>p.category===cat).forEach(p=>{
+      const cost = productCost(p), profit = productProfit(p), margin = productMarginPct(p);
+      const card = document.createElement('div');
+      card.className = 'card product-card' + (p.soon ? ' soon' : '');
+      card.innerHTML = `
+        <div class="product-head">
+          <input class="name" style="border:none; background:transparent; padding:0; font-weight:700; font-size:15px;" value="${escapeHtml(p.name)}" oninput="updateProduct(${p.id},'name',this.value)">
+          <button class="btn-remove" onclick="removeProduct(${p.id})">&times;</button>
+        </div>
+        <div id="lines-${p.id}"></div>
+        <button class="btn-add" onclick="addLine(${p.id})">+ Add cost line</button>
+        <div class="row" style="margin-top:10px;">
+          <label class="field" style="flex:1; margin-bottom:0;"><span>Selling price</span>
+            <input type="number" inputmode="decimal" value="${escapeHtml(p.sellingPrice)}" oninput="updateProduct(${p.id},'sellingPrice',this.value)">
+          </label>
+        </div>
+        <div class="stat-grid" style="margin-top:10px;">
+          <div class="stat"><div class="lbl">Cost price</div><div class="val">${fmt(cost)}</div></div>
+          <div class="stat"><div class="lbl">Profit</div><div class="val tone-forest">${fmt(profit)}</div></div>
+          <div class="stat"><div class="lbl">Margin</div><div class="val ${margin<20?'tone-flame':'tone-forest'}">${margin.toFixed(0)}%</div></div>
+        </div>
+        ${p.soon ? '<div class="hint" style="margin-top:8px; font-size:12px; color:var(--muted);">Marked coming soon &mdash; excluded from sales and analytics until you switch it on by unchecking soon in code, or simply start logging sales for it.</div>' : ''}
+      `;
+      list.appendChild(card);
+      renderLines(p);
+    });
+  });
+}
+function renderLines(p){
+  const el = document.getElementById('lines-'+p.id);
+  if(!el) return;
+  el.innerHTML = "";
+  p.lines.forEach((l,idx)=>{
+    const row = document.createElement('div');
+    row.className = 'row';
+    row.innerHTML = `
+      <input value="${escapeHtml(l.n)}" placeholder="Cost line, e.g. Cheese" oninput="updateLine(${p.id},${idx},'n',this.value)">
+      <input class="narrow" type="number" inputmode="decimal" value="${escapeHtml(l.c)}" placeholder="Cost" oninput="updateLine(${p.id},${idx},'c',this.value)">
+      <button class="btn-remove" onclick="removeLine(${p.id},${idx})">&times;</button>
+    `;
+    el.appendChild(row);
+  });
+}
+function updateProduct(id, field, val){
+  const p = state.products.find(x=>x.id===id);
+  if(p){ p[field]=val; saveState(); renderMenu(); recalcDashboard(); }
+}
+function updateLine(pid, idx, field, val){
+  const p = state.products.find(x=>x.id===pid);
+  if(p && p.lines[idx]){ p.lines[idx][field]=val; saveState(); renderMenu(); recalcDashboard(); }
+}
+function addLine(pid){
+  const p = state.products.find(x=>x.id===pid);
+  if(p){ p.lines.push({n:"",c:""}); saveState(); renderMenu(); }
+}
+function removeLine(pid, idx){
+  const p = state.products.find(x=>x.id===pid);
+  if(p){ p.lines.splice(idx,1); saveState(); renderMenu(); }
+}
+function addProduct(){
+  const name = document.getElementById('newProdName').value.trim();
+  const cat = document.getElementById('newProdCat').value;
+  if(!name) return;
+  state.products.push({ id:newId(), category:cat, name, lines:[{n:"Ingredient",c:""}], sellingPrice:"" });
+  document.getElementById('newProdName').value = "";
+  saveState(); renderMenu(); populateSaleProductSelect();
+}
+function removeProduct(id){
+  state.products = state.products.filter(p=>p.id!==id);
+  saveState(); renderMenu(); populateSaleProductSelect();
+}
+
+/* ---------- inventory ---------- */
+function renderInventory(){
+  const list = document.getElementById('inventoryList');
+  if(state.inventory.length===0){ list.innerHTML = '<p class="empty">No stock items yet.</p>'; return; }
+  list.innerHTML = "";
+  state.inventory.forEach(it=>{
+    const qty=num(it.qty), low=num(it.low), isLow = it.low!=="" && qty<=low;
+    const card = document.createElement('div');
+    card.className = 'card' + (isLow ? '' : '');
+    card.style.borderColor = isLow ? "#C6401F" : "";
+    if(isLow) card.style.background = "#FBEDE8";
+    card.innerHTML = `
+      <div class="row">
+        <input value="${escapeHtml(it.name)}" placeholder="Stock item" oninput="updateInv(${it.id},'name',this.value)">
+        <button class="btn-remove" onclick="removeInv(${it.id})">&times;</button>
+      </div>
+      <div class="row">
+        <input type="number" inputmode="decimal" value="${escapeHtml(it.qty)}" placeholder="Qty on hand" oninput="updateInv(${it.id},'qty',this.value)">
+        <select onchange="updateInv(${it.id},'unit',this.value)">
+          ${['kg','g','l','ml','units','packs'].map(u=>`<option value="${u}" ${it.unit===u?'selected':''}>${u}</option>`).join('')}
+        </select>
+        <input type="number" inputmode="decimal" value="${escapeHtml(it.low)}" placeholder="Reorder level" oninput="updateInv(${it.id},'low',this.value)">
+      </div>
+      ${isLow ? `<div style="font-size:13px; color:#8A2913; font-weight:700;">&#9888; ${it.name||'Item'} below reorder level &mdash; ${qty} ${it.unit} left.</div>` : ''}
+    `;
+    list.appendChild(card);
+  });
+}
+function updateInv(id, field, val){
+  const it = state.inventory.find(i=>i.id===id);
+  if(it){ it[field]=val; saveState(); renderInventory(); recalcDashboard(); }
+}
+function addInventoryItem(){
+  state.inventory.push({id:newId(), name:"", qty:"", unit:"kg", low:""});
+  saveState(); renderInventory();
+}
+function removeInv(id){
+  state.inventory = state.inventory.filter(i=>i.id!==id);
+  saveState(); renderInventory(); recalcDashboard();
+}
+
+/* ---------- suppliers ---------- */
+function renderSuppliers(){
+  const wrap = document.getElementById('supplierGroups');
+  if(state.suppliers.length===0){ wrap.innerHTML = '<p class="empty">No supplier prices logged yet.</p>'; return; }
+  wrap.innerHTML = "";
+  const items = [...new Set(state.suppliers.map(s=>s.item))];
+  items.forEach(item=>{
+    const rows = state.suppliers.filter(s=>s.item===item);
+    const prices = rows.map(r=>num(r.price)).filter(v=>v>0);
+    const min = prices.length ? Math.min(...prices) : null;
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <div class="product-head"><span class="name" style="font-size:14px;">${escapeHtml(item)}</span></div>
+      <table class="tbl">
+        <thead><tr><th>Supplier</th><th>Category</th><th>Price</th><th></th></tr></thead>
+        <tbody>
+          ${rows.map(r=>`<tr>
+            <td>${escapeHtml(r.name)}</td>
+            <td>${escapeHtml(r.category)}</td>
+            <td class="${num(r.price)===min ? 'best' : ''}">${fmt(num(r.price))}</td>
+            <td><button class="btn-remove" onclick="removeSupplier(${r.id})">&times;</button></td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    `;
+    wrap.appendChild(card);
+  });
+}
+function addSupplierEntry(){
+  const item = document.getElementById('supItem').value.trim();
+  const category = document.getElementById('supCategory').value;
+  const name = document.getElementById('supName').value.trim();
+  const price = document.getElementById('supPrice').value;
+  if(!item || !name) return;
+  state.suppliers.push({id:newId(), item, category, name, price});
+  ['supItem','supName','supPrice'].forEach(id=>document.getElementById(id).value="");
+  saveState(); renderSuppliers();
+}
+function removeSupplier(id){
+  state.suppliers = state.suppliers.filter(s=>s.id!==id);
+  saveState(); renderSuppliers();
+}
+
+/* ---------- sales ---------- */
+function populateSaleProductSelect(){
+  const sel = document.getElementById('saleProduct');
+  sel.innerHTML = state.products.filter(p=>!p.soon).map(p=>`<option value="${p.id}">${escapeHtml(p.category)} &mdash; ${escapeHtml(p.name)}</option>`).join('');
+  if(!document.getElementById('saleDate').value) document.getElementById('saleDate').value = todayStr();
+}
+function logSale(){
+  const pid = Number(document.getElementById('saleProduct').value);
+  const qty = num(document.getElementById('saleQty').value) || 1;
+  const date = document.getElementById('saleDate').value || todayStr();
+  if(!pid) return;
+  state.sales.push({id:newId(), productId:pid, qty, date});
+  saveState(); renderSales(); recalcDashboard(); renderAnalytics();
+}
+function removeSale(id){
+  state.sales = state.sales.filter(s=>s.id!==id);
+  saveState(); renderSales(); recalcDashboard(); renderAnalytics();
+}
+function renderSales(){
+  const body = document.getElementById('salesBody');
+  if(state.sales.length===0){ body.innerHTML = '<tr><td colspan="6" class="empty">No sales logged yet.</td></tr>'; return; }
+  const sorted = [...state.sales].sort((a,b)=> (b.date||'').localeCompare(a.date||''));
+  body.innerHTML = sorted.map(s=>{
+    const p = state.products.find(x=>x.id===s.productId);
+    if(!p) return '';
+    const revenue = num(p.sellingPrice)*s.qty;
+    const profit = productProfit(p)*s.qty;
+    return `<tr>
+      <td>${escapeHtml(s.date)}</td>
+      <td>${escapeHtml(p.name)}</td>
+      <td>${s.qty}</td>
+      <td>${fmt(revenue)}</td>
+      <td class="tone-forest">${fmt(profit)}</td>
+      <td><button class="btn-remove" onclick="removeSale(${s.id})">&times;</button></td>
+    </tr>`;
+  }).join('');
+}
+
+/* ---------- dashboard ---------- */
+function recalcDashboard(){
+  const today = todayStr();
+  const todays = state.sales.filter(s=>s.date===today);
+  let revenue=0, cost=0, orders=0;
+  const unitsByProduct = {};
+  todays.forEach(s=>{
+    const p = state.products.find(x=>x.id===s.productId);
+    if(!p) return;
+    revenue += num(p.sellingPrice)*s.qty;
+    cost += productCost(p)*s.qty;
+    orders += s.qty;
+    unitsByProduct[p.id] = (unitsByProduct[p.id]||0) + s.qty;
+  });
+  const profit = revenue-cost;
+  document.getElementById('dashRevenue').textContent = fmt(revenue);
+  document.getElementById('dashProfit').textContent = fmt(profit);
+  document.getElementById('dashOrders').textContent = orders;
+  let bestId = null, bestQty = -1;
+  Object.entries(unitsByProduct).forEach(([id,q])=>{ if(q>bestQty){ bestQty=q; bestId=Number(id);} });
+  const bestP = bestId ? state.products.find(p=>p.id===bestId) : null;
+  document.getElementById('dashBestSeller').textContent = bestP ? bestP.name : "No sales yet";
+
+  const lowItems = state.inventory.filter(it=>it.low!=="" && num(it.qty)<=num(it.low));
+  document.getElementById('stockAlertCount').textContent = lowItems.length;
+  const alertsEl = document.getElementById('dashStockAlerts');
+  alertsEl.innerHTML = lowItems.length===0
+    ? '<p class="empty" style="padding:6px 0;">Nothing low right now.</p>'
+    : lowItems.map(it=>`<div style="font-size:13px; color:#8A2913; font-weight:600; padding:4px 0;">&#9888; ${escapeHtml(it.name)} below reorder level &mdash; ${num(it.qty)} ${it.unit} left</div>`).join('');
+
+  renderKpis();
+}
+function monthRange(){
+  const now = new Date();
+  const y = now.getFullYear(), m = now.getMonth();
+  return { start: new Date(y,m,1), end: new Date(y,m+1,0) };
+}
+function renderKpis(){
+  const {start,end} = monthRange();
+  const monthly = state.sales.filter(s=>{ const d=new Date(s.date); return d>=start && d<=end; });
+  let revenue=0, cost=0;
+  monthly.forEach(s=>{ const p=state.products.find(x=>x.id===s.productId); if(!p) return; revenue+=num(p.sellingPrice)*s.qty; cost+=productCost(p)*s.qty; });
+  const profit = revenue-cost;
+  const foodCostPct = revenue>0 ? (cost/revenue)*100 : 0;
+  const grossMarginPct = revenue>0 ? (profit/revenue)*100 : 0;
+  const totalUnits = monthly.reduce((s,x)=>s+x.qty,0);
+  const aov = totalUnits>0 ? revenue/totalUnits : 0;
+  const rows = [
+    ["Food cost %", foodCostPct, "Below 35%", foodCostPct>0 && foodCostPct<35],
+    ["Gross margin", grossMarginPct, "Above 60%", grossMarginPct>60],
+    ["Average order value", aov, "Above R120", aov>120],
+    ["Monthly revenue", revenue, "R100,000+", revenue>=100000],
+    ["Monthly profit", profit, "R40,000+", profit>=40000],
+  ];
+  document.getElementById('kpiList').innerHTML = rows.map(([label,val,target,pass])=>{
+    const display = label.includes('%') || label==='Gross margin' || label==='Food cost %' ? val.toFixed(0)+"%" : fmt(val);
+    return `<div class="kpi-row"><span>${label}: <strong>${display}</strong></span><span class="kpi-target">${target} &mdash; <span class="${pass?'kpi-pass':'kpi-fail'}">${pass?'on track':'below target'}</span></span></div>`;
+  }).join('');
+}
+
+/* ---------- analytics ---------- */
+function productAggregate(){
+  const agg = {};
+  state.sales.forEach(s=>{
+    const p = state.products.find(x=>x.id===s.productId);
+    if(!p) return;
+    if(!agg[p.id]) agg[p.id] = { p, units:0, revenue:0, profit:0 };
+    agg[p.id].units += s.qty;
+    agg[p.id].revenue += num(p.sellingPrice)*s.qty;
+    agg[p.id].profit += productProfit(p)*s.qty;
+  });
+  return Object.values(agg);
+}
+function renderAnalytics(){
+  const agg = productAggregate();
+  const topSellers = [...agg].sort((a,b)=>b.units-a.units).slice(0,5);
+  const highProfit = [...agg].sort((a,b)=>b.profit-a.profit).slice(0,5);
+  const marginList = state.products.filter(p=>!p.soon && num(p.sellingPrice)>0).map(p=>({p, margin:productMarginPct(p)})).sort((a,b)=>a.margin-b.margin).slice(0,5);
+
+  document.getElementById('topSellers').innerHTML = topSellers.length ? topSellers.map((x,i)=>`<div class="kpi-row"><span>${i+1}. ${escapeHtml(x.p.name)}</span><span>${x.units} sold</span></div>`).join('') : '<p class="empty" style="padding:6px 0;">Log some sales to see this.</p>';
+  document.getElementById('highProfit').innerHTML = highProfit.length ? highProfit.map((x,i)=>`<div class="kpi-row"><span>${i+1}. ${escapeHtml(x.p.name)}</span><span class="tone-forest">${fmt(x.profit)}</span></div>`).join('') : '<p class="empty" style="padding:6px 0;">Log some sales to see this.</p>';
+  document.getElementById('lowMargin').innerHTML = marginList.length ? marginList.map((x,i)=>`<div class="kpi-row"><span>${i+1}. ${escapeHtml(x.p.name)}</span><span class="tone-flame">${x.margin.toFixed(0)}%</span></div>`).join('') : '<p class="empty" style="padding:6px 0;">Add selling prices to see this.</p>';
+}
+
+/* ---------- marketing ---------- */
+function renderMarketing(){
+  const body = document.getElementById('marketingBody');
+  if(state.marketing.length===0){ body.innerHTML = '<tr><td colspan="5" class="empty">No entries yet.</td></tr>'; return; }
+  const sorted = [...state.marketing].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  body.innerHTML = sorted.map(m=>`<tr>
+    <td>${escapeHtml(m.date)}</td><td>${escapeHtml(m.channel)}</td><td>${escapeHtml(m.value)}</td><td>${escapeHtml(m.note||'')}</td>
+    <td><button class="btn-remove" onclick="removeMarketing(${m.id})">&times;</button></td>
+  </tr>`).join('');
+}
+function addMarketing(){
+  const channel = document.getElementById('mkChannel').value;
+  const date = document.getElementById('mkDate').value || todayStr();
+  const value = document.getElementById('mkValue').value;
+  const note = document.getElementById('mkNote').value.trim();
+  if(!value) return;
+  state.marketing.push({id:newId(), channel, date, value, note});
+  document.getElementById('mkValue').value=""; document.getElementById('mkNote').value="";
+  saveState(); renderMarketing();
+}
+function removeMarketing(id){
+  state.marketing = state.marketing.filter(m=>m.id!==id);
+  saveState(); renderMarketing();
+}
+
+/* ---------- AI-style offline assistant ---------- */
+function askPreset(kind){
+  const map = {
+    profit: "Which product made the most profit this month?",
+    ingredient: "Which ingredient is costing too much?",
+    price: "What should I increase prices on?",
+  };
+  document.getElementById('aiInput').value = map[kind];
+  runAsk();
+}
+function runAsk(){
+  const text = (document.getElementById('aiInput').value || "").toLowerCase();
+  const resultEl = document.getElementById('aiResult');
+  const agg = productAggregate();
+
+  if(text.includes('most profit')){
+    if(agg.length===0){ resultEl.innerHTML = answerCard("No sales logged yet this month, so there's nothing to rank. Log sales in the Sales tab first."); return; }
+    const top = [...agg].sort((a,b)=>b.profit-a.profit)[0];
+    resultEl.innerHTML = answerCard(`${top.p.name} made the most profit: ${fmt(top.profit)} from ${top.units} sold.`);
+    return;
+  }
+  if(text.includes('ingredient') && (text.includes('cost') || text.includes('expensive'))){
+    const lineTotals = {};
+    state.products.forEach(p=>p.lines.forEach(l=>{ if(!l.n) return; lineTotals[l.n] = (lineTotals[l.n]||0) + num(l.c); }));
+    const sorted = Object.entries(lineTotals).sort((a,b)=>b[1]-a[1]);
+    if(sorted.length===0){ resultEl.innerHTML = answerCard("No cost lines found yet. Add ingredients in Menu costing first."); return; }
+    resultEl.innerHTML = answerCard(`${sorted[0][0]} is your biggest cost line across the menu, adding up to ${fmt(sorted[0][1])} across all recipes that use it.`);
+    return;
+  }
+  if(text.includes('increase price') || text.includes('raise price') || text.includes('increase prices')){
+    const marginList = state.products.filter(p=>!p.soon && num(p.sellingPrice)>0).map(p=>({p, margin:productMarginPct(p)})).sort((a,b)=>a.margin-b.margin);
+    if(marginList.length===0){ resultEl.innerHTML = answerCard("Add selling prices to your menu items first so margins can be compared."); return; }
+    const worst = marginList.slice(0,3);
+    resultEl.innerHTML = answerCard(`Consider raising prices on: ${worst.map(x=>`${x.p.name} (${x.margin.toFixed(0)}% margin)`).join(', ')}.`);
+    return;
+  }
+  const targetMatch = text.match(/r?\s?([\d,]{3,})/);
+  const productMatch = state.products.find(p=> text.includes(p.name.toLowerCase()));
+  if(targetMatch && productMatch){
+    const target = num(targetMatch[1].replace(/,/g,''));
+    const price = num(productMatch.sellingPrice);
+    if(price<=0){ resultEl.innerHTML = answerCard(`${productMatch.name} doesn't have a selling price set yet.`); return; }
+    const unitsNeeded = Math.ceil(target/price);
+    resultEl.innerHTML = answerCard(`You'd need to sell ${unitsNeeded} x ${productMatch.name} at ${fmt(price)} each to reach ${fmt(target)} in revenue.`);
+    return;
+  }
+  resultEl.innerHTML = answerCard("Try one of the quick questions above, or ask things like \"how many burgers must I sell to reach R20000\" using a product name from your menu.");
+}
+function answerCard(text){
+  return `<div class="card" style="margin-bottom:0;"><div style="font-size:14px;">${text}</div></div>`;
+}
+
+/* ---------- init ---------- */
+document.addEventListener('DOMContentLoaded', ()=>{
+  renderMenu();
+  renderInventory();
+  renderSuppliers();
+  populateSaleProductSelect();
+  renderSales();
+  renderAnalytics();
+  renderMarketing();
+  recalcDashboard();
+});
+</script>
+</body>
+</html>

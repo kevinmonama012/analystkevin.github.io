@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Prime Bytes · brand & waitlist</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, system-ui, sans-serif; }
+        body { background: #fbf7f0; color: #1e1e1e; line-height: 1.6; }
+        .container { max-width: 1300px; margin: 0 auto; padding: 0 2rem; }
+        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 0; border-bottom: 2px solid #d9b382; flex-wrap: wrap; }
+        .logo { font-size: 2rem; font-weight: 700; letter-spacing: -0.5px; color: #2c3e2f; }
+        .logo span { color: #b76e3a; }
+        .nav-links { display: flex; gap: 2.5rem; font-weight: 500; align-items: center; }
+        .nav-links a { text-decoration: none; color: #2c3e2f; transition: 0.2s; }
+        .nav-links a:hover { color: #b76e3a; }
+        .btn-outline { border: 2px solid #b76e3a; padding: 0.4rem 1.4rem; border-radius: 40px; background: transparent; font-weight: 600; color: #b76e3a; transition: 0.2s; cursor: pointer; }
+        .btn-outline:hover { background: #b76e3a; color: #fff; }
+        .hero { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; padding: 3rem 0 2rem; }
+        .hero-text { flex: 1 1 400px; }
+        .hero-text h1 { font-size: 3.2rem; font-weight: 800; line-height: 1.2; color: #1e2b21; }
+        .hero-text h1 i { color: #b76e3a; }
+        .hero-text p { font-size: 1.2rem; margin: 1.2rem 0 2rem; color: #3d4a3f; max-width: 550px; }
+        .hero-stats { display: flex; gap: 2.5rem; margin: 1.5rem 0; flex-wrap: wrap; }
+        .stat-item { display: flex; align-items: center; gap: 0.6rem; }
+        .stat-item i { font-size: 1.6rem; color: #b76e3a; }
+        .hero-image { flex: 1 1 300px; background: #d9c5b0; border-radius: 40px 40px 40px 0; padding: 2rem 1.5rem; text-align: center; box-shadow: 0 12px 24px rgba(0,0,0,0.06); background-image: linear-gradient(145deg, #e6d7c0, #d6c0a8); }
+        .hero-image i { font-size: 5rem; color: #2c3e2f; opacity: 0.8; }
+        .hero-image h3 { margin-top: 0.5rem; font-weight: 600; }
+        .waitlist-card { background: #2c3e2f; color: #f4efe8; border-radius: 50px 20px 50px 20px; padding: 2.5rem 3rem; margin: 2.5rem 0; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
+        .waitlist-card h2 { font-size: 1.8rem; font-weight: 600; }
+        .waitlist-card h2 i { color: #f3c98b; margin-right: 10px; }
+        .waitlist-form { display: flex; flex-wrap: wrap; gap: 0.8rem; align-items: center; }
+        .waitlist-form input { padding: 0.8rem 1.2rem; border: none; border-radius: 60px; min-width: 220px; font-size: 1rem; background: #f4efe8; }
+        .waitlist-form button { background: #b76e3a; border: none; padding: 0.8rem 2rem; border-radius: 60px; font-weight: 700; color: white; font-size: 1rem; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 0.5rem; }
+        .waitlist-form button:hover { background: #9f5c2e; transform: scale(1.02); }
+        .section-title { font-size: 2rem; font-weight: 700; margin: 3rem 0 1.5rem; border-left: 8px solid #b76e3a; padding-left: 1.2rem; }
+        .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 2rem; margin: 1.5rem 0 2rem; }
+        .service-card { background: white; border-radius: 30px; padding: 1.8rem 1.5rem; box-shadow: 0 6px 18px rgba(0,0,0,0.04); transition: 0.25s; border: 1px solid #ede5d9; }
+        .service-card:hover { transform: translateY(-8px); box-shadow: 0 16px 32px rgba(0,0,0,0.06); border-color: #b76e3a; }
+        .service-card i { font-size: 2.4rem; color: #b76e3a; margin-bottom: 0.8rem; }
+        .service-card h4 { font-size: 1.3rem; font-weight: 700; margin-bottom: 0.4rem; }
+        .service-card p { color: #4a554b; font-size: 0.95rem; }
+        .badge { display: inline-block; background: #e7dace; padding: 0.2rem 1rem; border-radius: 30px; font-size: 0.75rem; font-weight: 600; margin-top: 0.7rem; color: #2c3e2f; }
+        .meal-grid { display: flex; flex-wrap: wrap; gap: 0.8rem 1.5rem; background: #f3ede6; padding: 1.8rem 2rem; border-radius: 60px 20px 60px 20px; margin: 1rem 0 2rem; }
+        .meal-tag { background: white; padding: 0.4rem 1.4rem; border-radius: 40px; font-weight: 500; box-shadow: 0 2px 6px rgba(0,0,0,0.02); display: inline-flex; align-items: center; gap: 8px; }
+        .meal-tag i { color: #b76e3a; }
+        .feature-block { display: flex; flex-wrap: wrap; gap: 2.5rem; background: #fffcf7; padding: 2rem 2.2rem; border-radius: 40px; margin: 2rem 0; border: 1px solid #e1d3c4; }
+        .feature-block div { flex: 1 1 200px; }
+        .calendar-note { background: #2c3e2f10; padding: 0.8rem 1.5rem; border-radius: 60px; border: 1px dashed #b76e3a; font-weight: 500; }
+        .calendar-table { width: 100%; border-collapse: collapse; margin-top: 1rem; background: white; border-radius: 20px; overflow: hidden; }
+        .calendar-table th, .calendar-table td { padding: 0.7rem 1rem; text-align: left; border-bottom: 1px solid #ede5d9; }
+        .calendar-table th { background: #2c3e2f; color: #f4efe8; }
+        .footer { margin: 4rem 0 2rem; border-top: 2px solid #d9c5b0; padding-top: 2rem; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2rem; font-size: 0.9rem; }
+        .footer i { margin-right: 6px; color: #b76e3a; }
+        .status-msg { margin-top: 0.6rem; font-size: 0.9rem; }
+        @media (max-width: 700px) {
+            .navbar { flex-direction: column; gap: 1rem; }
+            .hero-text h1 { font-size: 2.4rem; }
+            .waitlist-card { flex-direction: column; align-items: stretch; gap: 1rem; }
+            .waitlist-form input { min-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <nav class="navbar">
+        <div class="logo">Prime <span>Bytes</span></div>
+        <div class="nav-links">
+            <a href="#spaces">Spaces</a>
+            <a href="#menu">Menu</a>
+            <a href="#bnb">BnB</a>
+            <a href="#pool">Pool</a>
+            <button class="btn-outline" onclick="document.getElementById('waitlist-email').focus()">Join waitlist</button>
+        </div>
+    </nav>
+
+    <div class="hero">
+        <div class="hero-text">
+            <h1>build a brand, <br /><i>not just a business</i></h1>
+            <p>Prime Bytes · Soshanguve BB · from legacy to landmark. Katlego Monama is turning a family inheritance into a community hub — food, car wash, IT services, pool events, and stays, all under one roof.</p>
+            <div class="hero-stats">
+                <div class="stat-item"><i class="fas fa-utensils"></i> 4+ food concepts</div>
+                <div class="stat-item"><i class="fas fa-car"></i> car wash</div>
+                <div class="stat-item"><i class="fas fa-laptop"></i> IT shop</div>
+            </div>
+            <div style="display: flex; gap: 0.6rem; flex-wrap: wrap; margin-top: 0.8rem;">
+                <span style="background:#b76e3a20; padding:0.2rem 1.2rem; border-radius:40px;">🎂 pool events</span>
+                <span style="background:#b76e3a20; padding:0.2rem 1.2rem; border-radius:40px;">🛏️ BnB</span>
+                <span style="background:#b76e3a20; padding:0.2rem 1.2rem; border-radius:40px;">🍗 secret recipe</span>
+            </div>
+        </div>
+        <div class="hero-image">
+            <i class="fas fa-store-alt"></i>
+            <h3>Prime Bytes hub</h3>
+            <p style="margin-top: 4px;">swimming pool · thatch · bar <br /> 2nd floor planned</p>
+        </div>
+    </div>
+
+    <div class="waitlist-card" id="waitlist">
+        <div>
+            <h2><i class="fas fa-pen-fancy"></i> join the waitlist</h2>
+            <p style="opacity: 0.8; margin-top: 4px;">Be first to know when we open · exclusive launch offers</p>
+        </div>
+        <div>
+            <form class="waitlist-form" id="waitlistForm">
+                <input type="text" placeholder="first name" id="waitlist-name" />
+                <input type="email" id="waitlist-email" placeholder="your email" required />
+                <button type="submit"><i class="fas fa-arrow-right"></i> secure spot</button>
+            </form>
+            <div class="status-msg" id="waitlist-status"></div>
+        </div>
+    </div>
+
+    <h2 class="section-title" id="spaces"><i class="fas fa-cubes" style="color:#b76e3a;"></i> spaces · Prime Bytes</h2>
+    <div class="grid-4">
+        <div class="service-card"><i class="fas fa-utensils"></i><h4>Restaurant</h4><p>Breakfast · supper · fast food · liquor licence</p><span class="badge">pap & vleis · kota · burgers</span></div>
+        <div class="service-card"><i class="fas fa-car"></i><h4>Car wash</h4><p>2–3 cars at a time · express & detail</p><span class="badge"><i class="fas fa-water"></i> high pressure</span></div>
+        <div class="service-card"><i class="fas fa-laptop-code"></i><h4>IT shop</h4><p>Photocopy · typing · branding · repairs · websites & apps</p><span class="badge">branding & dev</span></div>
+        <div class="service-card"><i class="fas fa-swimmer"></i><h4>Pool & events</h4><p>Birthday parties · swimming lessons · private events</p><span class="badge"><i class="far fa-calendar-alt"></i> booking required</span></div>
+    </div>
+
+    <div id="bnb" style="background: #e8dfd4; border-radius: 30px; padding: 1.8rem 2rem; margin: 1.5rem 0;">
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 1rem;">
+            <i class="fas fa-bed" style="font-size: 2.8rem; color:#2c3e2f;"></i>
+            <div><h3>BnB · student accommodation</h3>
+            <p>4 bedrooms available · full revamp underway: new bedding, painted walls, tiled floors. <br /> <span style="background:#b76e3a20; padding:0.1rem 1rem; border-radius:40px;">coming soon</span></p>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="section-title" id="menu"><i class="fas fa-drumstick-bite" style="color:#b76e3a;"></i> signature meals</h2>
+    <div class="meal-grid">
+        <span class="meal-tag"><i class="fas fa-utensil-spoon"></i> African pap & vleis</span>
+        <span class="meal-tag"><i class="fas fa-burger"></i> Kota</span>
+        <span class="meal-tag"><i class="fas fa-bacon"></i> Burgers</span>
+        <span class="meal-tag"><i class="fas fa-bread-slice"></i> Vetkoek</span>
+        <span class="meal-tag"><i class="fas fa-hotdog"></i> Wors roll</span>
+        <span class="meal-tag"><i class="fas fa-french-fries"></i> Chips & fries</span>
+        <span class="meal-tag"><i class="fas fa-drumstick"></i> Deep fried chicken <span style="background: #b76e3a; color:white; border-radius:40px; padding:0 8px; font-size:0.7rem;">secret recipe</span></span>
+    </div>
+    <div style="background: #f6efe8; border-radius: 30px; padding: 1.2rem 2rem; margin: 0.5rem 0 2rem; display: flex; flex-wrap: wrap; gap: 1.2rem; align-items: center;">
+        <i class="fas fa-handshake" style="font-size: 2rem; color:#b76e3a;"></i>
+        <div><strong>Supply & partnership edge:</strong> farm-direct produce and a shared secret sauce collaboration with a neighbouring specialist — keeping quality high and costs down.</div>
+        <span style="background: #2c3e2f; color:white; padding:0.3rem 1.2rem; border-radius:60px; font-size:0.8rem;">brand building</span>
+    </div>
+
+    <h2 class="section-title" id="pool"><i class="fas fa-swimmer" style="color:#b76e3a;"></i> pool & events</h2>
+    <div class="feature-block">
+        <div><i class="fas fa-swimmer" style="font-size: 2.6rem; color:#b76e3a;"></i><h4>Swimming pool</h4><p>Being restored: pool fix & maintenance, thatch replacement, ceiling and carpet renewal in the bar area.</p></div>
+        <div><i class="fas fa-birthday-cake"></i><h4>Events</h4><p>Birthday parties · private events · swimming lessons</p></div>
+        <div style="flex: 1 1 100%;">
+            <div class="calendar-note"><i class="far fa-calendar-alt"></i> Operating calendar (proposed)</div>
+            <table class="calendar-table">
+                <tr><th>Day</th><th>Activity</th><th>Notes</th></tr>
+                <tr><td>Monday – Friday</td><td>Swimming lessons</td><td>Morning & after-school slots, booking required</td></tr>
+                <tr><td>Saturday</td><td>Birthday parties & private events</td><td>Full-day and half-day slots</td></tr>
+                <tr><td>Sunday</td><td>Family swim & events</td><td>Booking required, walk-ins subject to availability</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div><i class="fas fa-location-dot"></i> Soshanguve BB · restaurant, car wash, IT shop, pool, BnB</div>
+        <div><i class="fas fa-envelope"></i> primebytes@hub.co.za</div>
+        <div><i class="fas fa-seedling"></i> built on inheritance · turning debt into opportunity</div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('waitlistForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const email = document.getElementById('waitlist-email').value;
+        const name = document.getElementById('waitlist-name').value || 'guest';
+        const status = document.getElementById('waitlist-status');
+        if (email) {
+            status.textContent = `Thank you, ${name}! You're on the Prime Bytes waitlist.`;
+            status.style.color = '#f3c98b';
+            // In production: send {name, email, timestamp} to a backend/database instead of only logging
+            console.log(`Waitlist signup: ${name}, ${email}, ${new Date().toISOString()}`);
+            document.getElementById('waitlist-email').value = '';
+            document.getElementById('waitlist-name').value = '';
+        } else {
+            status.textContent = 'Please enter a valid email.';
+            status.style.color = '#e07a5f';
+        }
+    });
+</script>
+</body>
+</html>

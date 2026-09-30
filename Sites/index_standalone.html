@@ -1,0 +1,1542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GFI &mdash; Gedion Freight Intelligence</title>
+<style>
+/* ============================================================
+   Gedion Freight Intelligence — Control Tower visual system
+   Palette: night operations / radar-room, not SaaS-card default.
+   ============================================================ */
+
+@font-face {
+  font-family: "Fraunces-fallback";
+  src: local("Georgia");
+}
+
+:root {
+  --bg:        #07090D;
+  --bg-2:      #0B0F15;
+  --panel:     #10151C;
+  --panel-alt: #151C24;
+  --panel-glass: rgba(21, 28, 36, 0.55);
+  --border:    #1E2833;
+  --border-lt: #2A3847;
+  --amber:     #FF8A3D;
+  --amber-soft: #FFB380;
+  --amber-dim: #6B4322;
+  --teal:      #34E0C8;
+  --teal-dim:  #16544C;
+  --text:      #EDF2F6;
+  --text-mid:  #97A6B4;
+  --text-dim:  #5C6B79;
+  --danger:    #FF5D6C;
+  --success:   #3FE0A0;
+  --warn:      #F4C563;
+
+  --font-head: Georgia, "Iowan Old Style", "Palatino Linotype", "Book Antiqua", "Times New Roman", serif;
+  --font-body: -apple-system, "Inter", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --font-data: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, "Courier New", monospace;
+
+  --shadow-panel: 0 1px 0 rgba(255,255,255,0.03) inset, 0 20px 40px -24px rgba(0,0,0,0.65);
+  --radius: 10px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  height: 100%;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background:
+    radial-gradient(1100px 560px at 12% -8%, rgba(255,138,61,0.07), transparent 60%),
+    radial-gradient(900px 500px at 100% 0%, rgba(52,224,200,0.06), transparent 55%),
+    linear-gradient(180deg, var(--bg-2) 0%, var(--bg) 380px);
+  min-height: 100vh;
+  letter-spacing: 0.1px;
+}
+
+.scanlines {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.01) 0px,
+    rgba(255,255,255,0.01) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  z-index: 999;
+  mix-blend-mode: overlay;
+}
+
+/* ---------------- Topbar ---------------- */
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  padding: 18px 28px;
+  background: rgba(10,14,19,0.82);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  flex-wrap: wrap;
+}
+
+.brand { display: flex; align-items: center; gap: 14px; }
+
+.brand-mark {
+  font-family: var(--font-head);
+  font-style: italic;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--bg);
+  background: linear-gradient(135deg, var(--amber-soft), var(--amber));
+  padding: 5px 12px 7px;
+  border-radius: 6px;
+  box-shadow: 0 6px 18px -6px rgba(255,138,61,0.55);
+}
+
+.brand-text { display: flex; flex-direction: column; line-height: 1.3; }
+.brand-name { font-family: var(--font-head); font-size: 16.5px; font-weight: 600; letter-spacing: 0.2px; }
+.brand-tag { font-family: var(--font-data); font-size: 10.5px; color: var(--teal); letter-spacing: 0.4px; }
+
+.tabs {
+  display: flex;
+  gap: 2px;
+  flex: 1;
+  flex-wrap: wrap;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 4px;
+}
+
+.tab {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-mid);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px 15px;
+  cursor: pointer;
+  border-radius: 7px;
+  transition: color .15s ease, background .2s ease;
+}
+.tab:hover { color: var(--text); background: rgba(255,255,255,0.04); }
+.tab.active {
+  color: #1A0E06;
+  background: linear-gradient(135deg, var(--amber-soft), var(--amber));
+  font-weight: 600;
+  box-shadow: 0 4px 14px -4px rgba(255,138,61,0.5);
+}
+
+.clock {
+  font-family: var(--font-data);
+  color: var(--teal);
+  font-size: 15px;
+  min-width: 90px;
+  text-align: right;
+  letter-spacing: 0.5px;
+}
+
+/* ---------------- Layout scaffolding ---------------- */
+
+main#app { padding: 22px 24px 60px; max-width: 1500px; margin: 0 auto; }
+
+.view { display: none; animation: fadeIn .25s ease; }
+.view.active { display: block; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+.grid {
+  display: grid;
+  gap: 16px;
+}
+.grid-4 { grid-template-columns: repeat(4, 1fr); }
+.grid-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-2 { grid-template-columns: repeat(2, 1fr); }
+.grid-span-2 { grid-column: span 2; }
+
+@media (max-width: 1100px) {
+  .grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .grid-3 { grid-template-columns: repeat(2, 1fr); }
+  .grid-2 { grid-template-columns: 1fr; }
+  .grid-span-2 { grid-column: span 1; }
+}
+@media (max-width: 640px) {
+  .grid-4, .grid-3 { grid-template-columns: 1fr; }
+}
+
+/* ---------------- Panel (control-tower module) ---------------- */
+
+.panel {
+  position: relative;
+  background: linear-gradient(180deg, var(--panel-alt), var(--panel));
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 20px 18px;
+  box-shadow: var(--shadow-panel);
+}
+
+/* Fine top hairline accent — control-tower instrument feel, not a rounded SaaS card */
+.panel::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 20px; right: 20px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-lt) 20%, var(--border-lt) 80%, transparent);
+}
+
+.panel-title {
+  font-family: var(--font-data);
+  font-size: 11px;
+  letter-spacing: 0.6px;
+  color: var(--text-dim);
+  margin: 0 0 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.panel-title .badge {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: var(--teal);
+  border: 1px solid var(--teal-dim);
+  padding: 1px 8px;
+  border-radius: 20px;
+  background: rgba(52,224,200,0.06);
+}
+
+/* ---------------- KPI cards ---------------- */
+
+.kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.kpi-label {
+  font-family: var(--font-data);
+  font-size: 10.5px;
+  letter-spacing: 0.5px;
+  color: var(--text-dim);
+}
+.kpi-value {
+  font-family: var(--font-head);
+  font-size: 34px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.05;
+}
+.kpi-value.amber { color: var(--amber-soft); }
+.kpi-value.teal { color: var(--teal); }
+.kpi-value.danger { color: var(--danger); }
+.kpi-value.success { color: var(--success); }
+.kpi-sub { font-size: 12px; color: var(--text-mid); }
+
+/* ---------------- Bars / simple charts (hand-rolled, no CDN deps) ---------------- */
+
+.barlist { display: flex; flex-direction: column; gap: 10px; }
+.barrow { display: grid; grid-template-columns: 140px 1fr 70px; align-items: center; gap: 10px; }
+.barrow .label { font-size: 12.5px; color: var(--text-mid); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.barrow .track { height: 8px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 5px; overflow: hidden; }
+.barrow .fill { height: 100%; background: linear-gradient(90deg, var(--teal-dim), var(--teal)); }
+.barrow .fill.amber { background: linear-gradient(90deg, var(--amber-dim), var(--amber)); }
+.barrow .fill.danger { background: linear-gradient(90deg, #7a2126, var(--danger)); }
+.barrow .val { font-family: var(--font-data); font-size: 12px; text-align: right; color: var(--text); }
+
+.sparkline-wrap { width: 100%; overflow-x: auto; }
+
+/* ---------------- Tables ---------------- */
+
+table.data {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.8px;
+}
+table.data th {
+  text-align: left;
+  font-family: var(--font-data);
+  font-weight: 600;
+  color: var(--text-dim);
+  font-size: 10.5px;
+  letter-spacing: 0.4px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-lt);
+}
+table.data td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-mid);
+}
+table.data tr:last-child td { border-bottom: none; }
+table.data tr:hover td { background: rgba(255,255,255,0.02); color: var(--text); }
+
+.pill {
+  display: inline-block;
+  font-size: 10.5px;
+  font-family: var(--font-data);
+  padding: 2px 8px;
+  border-radius: 10px;
+  border: 1px solid var(--border-lt);
+}
+.pill.risk-High { color: var(--danger); border-color: #5b2226; }
+.pill.risk-Medium { color: var(--warn); border-color: #5b4a1f; }
+.pill.risk-Low { color: var(--success); border-color: #205a3d; }
+.pill.status-InTransit { color: var(--teal); border-color: var(--teal-dim); }
+.pill.status-Delayed { color: var(--danger); border-color: #5b2226; }
+.pill.status-Delivered { color: var(--success); border-color: #205a3d; }
+
+/* ---------------- Section header ---------------- */
+
+.view-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 22px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.view-head h1 {
+  font-family: var(--font-head);
+  font-style: italic;
+  font-size: 28px;
+  margin: 0;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 0.2px;
+}
+.view-head p { margin: 6px 0 0; color: var(--text-dim); font-size: 13.5px; max-width: 62ch; line-height: 1.5; }
+
+/* ---------------- Alert / incident feed ---------------- */
+
+.feed { display: flex; flex-direction: column; gap: 0; }
+.feed-item {
+  display: grid;
+  grid-template-columns: 82px 1fr 90px;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 12.5px;
+  align-items: center;
+}
+.feed-item:last-child { border-bottom: none; }
+.feed-item .date { font-family: var(--font-data); color: var(--text-dim); font-size: 11px; }
+.feed-item .type { color: var(--text); }
+.feed-item .type small { color: var(--text-dim); display:block; font-size: 11px; }
+.feed-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+.feed-dot.open { background: var(--danger); box-shadow: 0 0 6px var(--danger); }
+.feed-dot.resolved { background: var(--success); }
+
+/* ---------------- Marketplace cards ---------------- */
+
+.mp-card {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 13px 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  transition: border-color .15s ease, background .15s ease;
+}
+.mp-card:hover { border-color: var(--border-lt); background: rgba(255,255,255,0.035); }
+.mp-card .route { font-family: var(--font-data); color: var(--teal); font-size: 12px; letter-spacing: 0.2px; }
+.mp-card .cargo { font-size: 14px; color: var(--text); font-family: var(--font-head); }
+.mp-card .meta { font-size: 11.5px; color: var(--text-dim); display: flex; justify-content: space-between; align-items: center; }
+
+/* ---------------- Footer ---------------- */
+
+.statusbar {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 8px 24px;
+  background: #0A0E13;
+  border-top: 1px solid var(--border);
+  font-family: var(--font-data);
+  font-size: 11px;
+  color: var(--text-dim);
+  flex-wrap: wrap;
+}
+.statusbar code { color: var(--text-mid); }
+.offline-pill { color: var(--success); }
+
+/* ---------------- Misc ---------------- */
+
+.muted { color: var(--text-dim); }
+.two-col { display: grid; grid-template-columns: 1.3fr 1fr; gap: 16px; }
+@media (max-width: 1000px) { .two-col { grid-template-columns: 1fr; } }
+
+</style>
+</head>
+<body>
+
+<div class="scanlines" aria-hidden="true"></div>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark">GFI</span>
+    <div class="brand-text">
+      <span class="brand-name">Gedion Freight Intelligence</span>
+      <span class="brand-tag">Move Anything. Track Everything.</span>
+    </div>
+  </div>
+  <nav class="tabs" id="tabs">
+    <button class="tab active" data-view="tower">Control Tower</button>
+    <button class="tab" data-view="marketplace">Marketplace</button>
+    <button class="tab" data-view="fleet">Fleet &amp; Fuel</button>
+    <button class="tab" data-view="corridors">Corridors</button>
+    <button class="tab" data-view="border">Cross-Border</button>
+    <button class="tab" data-view="security">Security</button>
+    <button class="tab" data-view="revenue">Revenue</button>
+  </nav>
+  <div class="clock" id="clock">--:--:--</div>
+</header>
+
+<main id="app"></main>
+
+<footer class="statusbar">
+  <span>Data source: <code>data/gfi.db</code> &rarr; <code>web/data.js</code></span>
+  <span id="last-refresh"></span>
+  <span class="offline-pill">● Running offline — no server required</span>
+</footer>
+
+<script>
+// Auto-generated by python/analysis.py — do not edit by hand.
+// Re-run `python generate_data.py && python analysis.py` to refresh.
+const GFI_DATA = {
+  "kpis": {
+    "total_loads": 900,
+    "total_revenue_zar": 14103048.52,
+    "on_time_pct": 67.5,
+    "empty_return_pct": 30.0,
+    "active_trucks": 177,
+    "total_trucks": 239,
+    "fleet_utilisation_pct": 74.1,
+    "open_incidents": 19,
+    "active_customers": 16,
+    "mrr_zar": 46984.0
+  },
+  "revenue_by_corridor": [
+    {
+      "corridor": "Johannesburg-Maseru",
+      "revenue": 1534853.07,
+      "loads": 64,
+      "risk_rating": "Low",
+      "is_cross_border": 1
+    },
+    {
+      "corridor": "Johannesburg-Lusaka",
+      "revenue": 1474406.74,
+      "loads": 64,
+      "risk_rating": "High",
+      "is_cross_border": 1
+    },
+    {
+      "corridor": "Johannesburg-Harare",
+      "revenue": 1445133.27,
+      "loads": 63,
+      "risk_rating": "High",
+      "is_cross_border": 1
+    },
+    {
+      "corridor": "N4 Corridor (Maputo Link)",
+      "revenue": 1416935.0,
+      "loads": 64,
+      "risk_rating": "High",
+      "is_cross_border": 1
+    },
+    {
+      "corridor": "Johannesburg-Gaborone",
+      "revenue": 1408698.64,
+      "loads": 62,
+      "risk_rating": "Low",
+      "is_cross_border": 1
+    },
+    {
+      "corridor": "Johannesburg-Windhoek",
+      "revenue": 1244344.36,
+      "loads": 55,
+      "risk_rating": "Medium",
+      "is_cross_border": 1
+    },
+    {
+      "corridor": "Johannesburg-Mbabane",
+      "revenue": 1218472.05,
+      "loads": 57,
+      "risk_rating": "Low",
+      "is_cross_border": 1
+    },
+    {
+      "corridor": "Gqeberha-Gauteng",
+      "revenue": 1190017.46,
+      "loads": 58,
+      "risk_rating": "Medium",
+      "is_cross_border": 0
+    },
+    {
+      "corridor": "Durban-Johannesburg",
+      "revenue": 1141575.04,
+      "loads": 54,
+      "risk_rating": "High",
+      "is_cross_border": 0
+    },
+    {
+      "corridor": "N3 Corridor (Durban-Free State)",
+      "revenue": 1063690.09,
+      "loads": 51,
+      "risk_rating": "Medium",
+      "is_cross_border": 0
+    },
+    {
+      "corridor": "Cape Town-Johannesburg",
+      "revenue": 964922.8,
+      "loads": 62,
+      "risk_rating": "Medium",
+      "is_cross_border": 0
+    }
+  ],
+  "on_time_by_corridor": [
+    {
+      "corridor": "Johannesburg-Windhoek",
+      "on_time_pct": 82.2,
+      "deliveries": 45
+    },
+    {
+      "corridor": "Durban-Johannesburg",
+      "on_time_pct": 79.1,
+      "deliveries": 43
+    },
+    {
+      "corridor": "Johannesburg-Gaborone",
+      "on_time_pct": 76.1,
+      "deliveries": 46
+    },
+    {
+      "corridor": "Gqeberha-Gauteng",
+      "on_time_pct": 73.2,
+      "deliveries": 41
+    },
+    {
+      "corridor": "Johannesburg-Harare",
+      "on_time_pct": 70.2,
+      "deliveries": 47
+    },
+    {
+      "corridor": "Johannesburg-Mbabane",
+      "on_time_pct": 65.1,
+      "deliveries": 43
+    },
+    {
+      "corridor": "Johannesburg-Lusaka",
+      "on_time_pct": 64.7,
+      "deliveries": 51
+    },
+    {
+      "corridor": "N3 Corridor (Durban-Free State)",
+      "on_time_pct": 60.5,
+      "deliveries": 38
+    },
+    {
+      "corridor": "N4 Corridor (Maputo Link)",
+      "on_time_pct": 60.4,
+      "deliveries": 53
+    },
+    {
+      "corridor": "Johannesburg-Maseru",
+      "on_time_pct": 57.4,
+      "deliveries": 47
+    },
+    {
+      "corridor": "Cape Town-Johannesburg",
+      "on_time_pct": 55.3,
+      "deliveries": 47
+    }
+  ],
+  "monthly_revenue": [
+    {
+      "month": "2025-09",
+      "invoiced": 859880.28,
+      "collected": 464522.51
+    },
+    {
+      "month": "2025-10",
+      "invoiced": 1496814.92,
+      "collected": 673908.38
+    },
+    {
+      "month": "2025-11",
+      "invoiced": 1723142.79,
+      "collected": 780706.67
+    },
+    {
+      "month": "2025-12",
+      "invoiced": 1754323.64,
+      "collected": 1014398.73
+    },
+    {
+      "month": "2026-01",
+      "invoiced": 1190481.14,
+      "collected": 440737.85
+    },
+    {
+      "month": "2026-02",
+      "invoiced": 1055356.16,
+      "collected": 404341.36
+    },
+    {
+      "month": "2026-03",
+      "invoiced": 1645601.02,
+      "collected": 784870.12
+    },
+    {
+      "month": "2026-04",
+      "invoiced": 1529008.12,
+      "collected": 882722.37
+    },
+    {
+      "month": "2026-05",
+      "invoiced": 1655518.55,
+      "collected": 940835.34
+    },
+    {
+      "month": "2026-06",
+      "invoiced": 1495928.26,
+      "collected": 678676.07
+    },
+    {
+      "month": "2026-07",
+      "invoiced": 1345409.77,
+      "collected": 696215.71
+    },
+    {
+      "month": "2026-08",
+      "invoiced": 1566211.74,
+      "collected": 800486.56
+    },
+    {
+      "month": "2026-09",
+      "invoiced": 593366.64,
+      "collected": 214528.76
+    }
+  ],
+  "fleet_by_transporter": [
+    {
+      "transporter": "Baobab Logistics",
+      "active": 31,
+      "idle": 5,
+      "maintenance": 4,
+      "fleet_size": 40,
+      "rating": 3.9
+    },
+    {
+      "transporter": "Table Mountain Trucking",
+      "active": 30,
+      "idle": 4,
+      "maintenance": 5,
+      "fleet_size": 39,
+      "rating": 4.4
+    },
+    {
+      "transporter": "Ubuntu Haulage",
+      "active": 25,
+      "idle": 8,
+      "maintenance": 4,
+      "fleet_size": 37,
+      "rating": 3.5
+    },
+    {
+      "transporter": "Big Five Transport",
+      "active": 24,
+      "idle": 6,
+      "maintenance": 5,
+      "fleet_size": 35,
+      "rating": 3.9
+    },
+    {
+      "transporter": "Kalahari Bulk Movers",
+      "active": 25,
+      "idle": 5,
+      "maintenance": 2,
+      "fleet_size": 32,
+      "rating": 3.3
+    },
+    {
+      "transporter": "Springbok Freight Carriers",
+      "active": 18,
+      "idle": 5,
+      "maintenance": 1,
+      "fleet_size": 24,
+      "rating": 4.6
+    },
+    {
+      "transporter": "Karoo Cross-Border Carriers",
+      "active": 14,
+      "idle": 4,
+      "maintenance": 1,
+      "fleet_size": 19,
+      "rating": 4.8
+    },
+    {
+      "transporter": "Highveld Express Freight",
+      "active": 10,
+      "idle": 3,
+      "maintenance": 0,
+      "fleet_size": 13,
+      "rating": 4.3
+    }
+  ],
+  "empty_return_by_transporter": [
+    {
+      "transporter": "Baobab Logistics",
+      "empty_return_pct": 37.0,
+      "loads": 119
+    },
+    {
+      "transporter": "Kalahari Bulk Movers",
+      "empty_return_pct": 32.4,
+      "loads": 111
+    },
+    {
+      "transporter": "Ubuntu Haulage",
+      "empty_return_pct": 31.6,
+      "loads": 98
+    },
+    {
+      "transporter": "Springbok Freight Carriers",
+      "empty_return_pct": 30.6,
+      "loads": 108
+    },
+    {
+      "transporter": "Big Five Transport",
+      "empty_return_pct": 30.3,
+      "loads": 109
+    },
+    {
+      "transporter": "Highveld Express Freight",
+      "empty_return_pct": 29.0,
+      "loads": 124
+    },
+    {
+      "transporter": "Table Mountain Trucking",
+      "empty_return_pct": 24.8,
+      "loads": 113
+    },
+    {
+      "transporter": "Karoo Cross-Border Carriers",
+      "empty_return_pct": 24.6,
+      "loads": 118
+    }
+  ],
+  "incidents_by_corridor": [
+    {
+      "corridor": "Johannesburg-Maseru",
+      "risk_rating": "Low",
+      "incidents": 10,
+      "thefts": 0,
+      "unresolved": 2
+    },
+    {
+      "corridor": "Johannesburg-Mbabane",
+      "risk_rating": "Low",
+      "incidents": 10,
+      "thefts": 2,
+      "unresolved": 2
+    },
+    {
+      "corridor": "Durban-Johannesburg",
+      "risk_rating": "High",
+      "incidents": 7,
+      "thefts": 2,
+      "unresolved": 3
+    },
+    {
+      "corridor": "Gqeberha-Gauteng",
+      "risk_rating": "Medium",
+      "incidents": 6,
+      "thefts": 0,
+      "unresolved": 2
+    },
+    {
+      "corridor": "N4 Corridor (Maputo Link)",
+      "risk_rating": "High",
+      "incidents": 6,
+      "thefts": 2,
+      "unresolved": 3
+    },
+    {
+      "corridor": "Cape Town-Johannesburg",
+      "risk_rating": "Medium",
+      "incidents": 5,
+      "thefts": 1,
+      "unresolved": 1
+    },
+    {
+      "corridor": "Johannesburg-Harare",
+      "risk_rating": "High",
+      "incidents": 5,
+      "thefts": 1,
+      "unresolved": 2
+    },
+    {
+      "corridor": "Johannesburg-Gaborone",
+      "risk_rating": "Low",
+      "incidents": 4,
+      "thefts": 1,
+      "unresolved": 2
+    },
+    {
+      "corridor": "Johannesburg-Lusaka",
+      "risk_rating": "High",
+      "incidents": 3,
+      "thefts": 0,
+      "unresolved": 1
+    },
+    {
+      "corridor": "Johannesburg-Windhoek",
+      "risk_rating": "Medium",
+      "incidents": 3,
+      "thefts": 0,
+      "unresolved": 1
+    },
+    {
+      "corridor": "N3 Corridor (Durban-Free State)",
+      "risk_rating": "Medium",
+      "incidents": 3,
+      "thefts": 0,
+      "unresolved": 0
+    }
+  ],
+  "recent_incidents": [
+    {
+      "date": "2026-09-10",
+      "type": "Hijack Attempt",
+      "corridor": "Johannesburg-Maseru",
+      "resolved": 1,
+      "truck": "MP640-G24"
+    },
+    {
+      "date": "2026-09-09",
+      "type": "Route Deviation",
+      "corridor": "Johannesburg-Maseru",
+      "resolved": 1,
+      "truck": "GP732-B40"
+    },
+    {
+      "date": "2026-08-27",
+      "type": "Panic Button",
+      "corridor": "N4 Corridor (Maputo Link)",
+      "resolved": 1,
+      "truck": "GP106-G11"
+    },
+    {
+      "date": "2026-08-25",
+      "type": "Theft",
+      "corridor": "Durban-Johannesburg",
+      "resolved": 1,
+      "truck": "GP454-H93"
+    },
+    {
+      "date": "2026-08-19",
+      "type": "Route Deviation",
+      "corridor": "Johannesburg-Windhoek",
+      "resolved": 1,
+      "truck": "EC806-E68"
+    },
+    {
+      "date": "2026-08-17",
+      "type": "Hijack Attempt",
+      "corridor": "Gqeberha-Gauteng",
+      "resolved": 1,
+      "truck": "EC377-E42"
+    },
+    {
+      "date": "2026-07-27",
+      "type": "Tamper Alert",
+      "corridor": "Durban-Johannesburg",
+      "resolved": 0,
+      "truck": "EC559-G58"
+    },
+    {
+      "date": "2026-07-23",
+      "type": "Route Deviation",
+      "corridor": "Johannesburg-Maseru",
+      "resolved": 1,
+      "truck": "EC424-H54"
+    },
+    {
+      "date": "2026-07-21",
+      "type": "Tamper Alert",
+      "corridor": "N3 Corridor (Durban-Free State)",
+      "resolved": 1,
+      "truck": "WC721-C50"
+    },
+    {
+      "date": "2026-07-14",
+      "type": "Route Deviation",
+      "corridor": "Johannesburg-Harare",
+      "resolved": 1,
+      "truck": "KZN993-E16"
+    },
+    {
+      "date": "2026-06-09",
+      "type": "Route Deviation",
+      "corridor": "Johannesburg-Maseru",
+      "resolved": 1,
+      "truck": "EC651-D72"
+    },
+    {
+      "date": "2026-06-08",
+      "type": "Theft",
+      "corridor": "Cape Town-Johannesburg",
+      "resolved": 1,
+      "truck": "MP880-C34"
+    }
+  ],
+  "border_performance": [
+    {
+      "border": "Beitbridge",
+      "country": "Zimbabwe",
+      "crossings": 65,
+      "avg_wait_hours": 7.25,
+      "customs_cleared_pct": 87.7
+    },
+    {
+      "border": "Ngwenya/Oshoek",
+      "country": "Eswatini",
+      "crossings": 77,
+      "avg_wait_hours": 6.5,
+      "customs_cleared_pct": 85.7
+    },
+    {
+      "border": "Vioolsdrif",
+      "country": "Namibia",
+      "crossings": 66,
+      "avg_wait_hours": 6.39,
+      "customs_cleared_pct": 78.8
+    },
+    {
+      "border": "Maseru Bridge",
+      "country": "Lesotho",
+      "crossings": 77,
+      "avg_wait_hours": 6.31,
+      "customs_cleared_pct": 85.7
+    },
+    {
+      "border": "Lebombo",
+      "country": "Mozambique",
+      "crossings": 69,
+      "avg_wait_hours": 6.29,
+      "customs_cleared_pct": 84.1
+    },
+    {
+      "border": "Kazungula",
+      "country": "Zambia",
+      "crossings": 70,
+      "avg_wait_hours": 6.12,
+      "customs_cleared_pct": 88.6
+    },
+    {
+      "border": "Kopfontein",
+      "country": "Botswana",
+      "crossings": 71,
+      "avg_wait_hours": 6.02,
+      "customs_cleared_pct": 87.3
+    }
+  ],
+  "revenue_by_industry": [
+    {
+      "industry": "Mining",
+      "revenue": 7223599.31,
+      "customers": 8
+    },
+    {
+      "industry": "Agriculture",
+      "revenue": 3301360.41,
+      "customers": 4
+    },
+    {
+      "industry": "Retail",
+      "revenue": 2110720.34,
+      "customers": 2
+    },
+    {
+      "industry": "Manufacturing",
+      "revenue": 1467368.46,
+      "customers": 2
+    }
+  ],
+  "subscriptions_by_tier": [
+    {
+      "plan_tier": "Basic",
+      "subscribers": 6,
+      "mrr": 2994.0
+    },
+    {
+      "plan_tier": "Enterprise",
+      "subscribers": 2,
+      "mrr": 19998.0
+    },
+    {
+      "plan_tier": "Professional",
+      "subscribers": 8,
+      "mrr": 23992.0
+    }
+  ],
+  "active_loads_board": [
+    {
+      "load_id": 323,
+      "corridor": "Johannesburg-Gaborone",
+      "cargo": "Platinum group metals",
+      "transporter": "Springbok Freight Carriers",
+      "truck": "WC112-G72",
+      "status": "InTransit",
+      "eta": "2025-09-21"
+    },
+    {
+      "load_id": 635,
+      "corridor": "Durban-Johannesburg",
+      "cargo": "Mixed fruit exports",
+      "transporter": "Big Five Transport",
+      "truck": "GP760-B88",
+      "status": "InTransit",
+      "eta": "2025-09-23"
+    },
+    {
+      "load_id": 804,
+      "corridor": "Johannesburg-Mbabane",
+      "cargo": "Platinum group metals",
+      "transporter": "Big Five Transport",
+      "truck": "MP640-G24",
+      "status": "InTransit",
+      "eta": "2025-09-23"
+    },
+    {
+      "load_id": 857,
+      "corridor": "Johannesburg-Maseru",
+      "cargo": "Wine cases",
+      "transporter": "Big Five Transport",
+      "truck": "GP619-A94",
+      "status": "InTransit",
+      "eta": "2025-09-23"
+    },
+    {
+      "load_id": 132,
+      "corridor": "Johannesburg-Harare",
+      "cargo": "Citrus (export pallets)",
+      "transporter": "Kalahari Bulk Movers",
+      "truck": "WC675-E27",
+      "status": "InTransit",
+      "eta": "2025-09-27"
+    },
+    {
+      "load_id": 627,
+      "corridor": "Cape Town-Johannesburg",
+      "cargo": "Mixed fruit exports",
+      "transporter": "Table Mountain Trucking",
+      "truck": "WC347-E94",
+      "status": "InTransit",
+      "eta": "2025-09-27"
+    },
+    {
+      "load_id": 515,
+      "corridor": "Johannesburg-Windhoek",
+      "cargo": "E-commerce parcels",
+      "transporter": "Big Five Transport",
+      "truck": "EC232-B49",
+      "status": "InTransit",
+      "eta": "2025-09-28"
+    },
+    {
+      "load_id": 690,
+      "corridor": "Johannesburg-Mbabane",
+      "cargo": "Citrus (export pallets)",
+      "transporter": "Table Mountain Trucking",
+      "truck": "KZN755-G60",
+      "status": "InTransit",
+      "eta": "2025-09-28"
+    },
+    {
+      "load_id": 51,
+      "corridor": "Johannesburg-Gaborone",
+      "cargo": "Gold concentrate",
+      "transporter": "Baobab Logistics",
+      "truck": "WC162-G45",
+      "status": "Delayed",
+      "eta": "2025-10-01"
+    },
+    {
+      "load_id": 345,
+      "corridor": "N3 Corridor (Durban-Free State)",
+      "cargo": "Mixed fruit exports",
+      "transporter": "Table Mountain Trucking",
+      "truck": "WC347-E94",
+      "status": "InTransit",
+      "eta": "2025-10-02"
+    },
+    {
+      "load_id": 890,
+      "corridor": "Johannesburg-Gaborone",
+      "cargo": "Chrome ore",
+      "transporter": "Kalahari Bulk Movers",
+      "truck": "GP346-D18",
+      "status": "InTransit",
+      "eta": "2025-10-03"
+    },
+    {
+      "load_id": 188,
+      "corridor": "Johannesburg-Harare",
+      "cargo": "Platinum group metals",
+      "transporter": "Baobab Logistics",
+      "truck": "WC923-B69",
+      "status": "Delayed",
+      "eta": "2025-10-08"
+    },
+    {
+      "load_id": 231,
+      "corridor": "Gqeberha-Gauteng",
+      "cargo": "Maize (bulk grain)",
+      "transporter": "Highveld Express Freight",
+      "truck": "EC172-D59",
+      "status": "InTransit",
+      "eta": "2025-10-15"
+    },
+    {
+      "load_id": 143,
+      "corridor": "N4 Corridor (Maputo Link)",
+      "cargo": "FMCG mixed pallets",
+      "transporter": "Highveld Express Freight",
+      "truck": "GP147-B90",
+      "status": "Delayed",
+      "eta": "2025-10-17"
+    },
+    {
+      "load_id": 636,
+      "corridor": "N4 Corridor (Maputo Link)",
+      "cargo": "Gold concentrate",
+      "transporter": "Table Mountain Trucking",
+      "truck": "EC689-D51",
+      "status": "InTransit",
+      "eta": "2025-10-17"
+    }
+  ],
+  "warehouses": [
+    {
+      "warehouse_name": "GFI Durban Distribution Centre",
+      "city": "Durban",
+      "capacity_pallets": 3954,
+      "manager_name": "Sipho Botha"
+    },
+    {
+      "warehouse_name": "GFI Johannesburg Distribution Centre",
+      "city": "Johannesburg",
+      "capacity_pallets": 2706,
+      "manager_name": "Tumi Nkosi"
+    },
+    {
+      "warehouse_name": "GFI Cape Town Distribution Centre",
+      "city": "Cape Town",
+      "capacity_pallets": 5714,
+      "manager_name": "Sipho Dlamini"
+    },
+    {
+      "warehouse_name": "GFI Gqeberha Distribution Centre",
+      "city": "Gqeberha",
+      "capacity_pallets": 7456,
+      "manager_name": "Pieter Nkosi"
+    }
+  ]
+};
+
+</script>
+<script>
+/* ============================================================
+   Gedion Freight Intelligence — Dashboard App
+   Pure vanilla JS. Reads window.GFI_DATA (from data.js).
+   No network calls — works fully offline via file://.
+   ============================================================ */
+
+const fmtZAR = (n) => "R " + Number(n || 0).toLocaleString("en-ZA", { maximumFractionDigits: 0 });
+const fmtNum = (n) => Number(n || 0).toLocaleString("en-ZA");
+const fmtPct = (n) => `${Number(n || 0).toFixed(1)}%`;
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+function barRow(label, value, max, fmt = fmtNum, cls = "") {
+  const pct = max > 0 ? Math.min(100, (value / max) * 100) : 0;
+  return `
+    <div class="barrow">
+      <div class="label" title="${esc(label)}">${esc(label)}</div>
+      <div class="track"><div class="fill ${cls}" style="width:${pct}%"></div></div>
+      <div class="val">${fmt(value)}</div>
+    </div>`;
+}
+
+function panel(title, innerHtml, badge = "") {
+  return `
+    <div class="panel">
+      <div class="panel-title"><span>${esc(title)}</span>${badge ? `<span class="badge">${esc(badge)}</span>` : ""}</div>
+      ${innerHtml}
+    </div>`;
+}
+
+function kpiCard(label, value, sub = "", cls = "") {
+  return `
+    <div class="panel kpi">
+      <div class="kpi-label">${esc(label)}</div>
+      <div class="kpi-value ${cls}">${value}</div>
+      ${sub ? `<div class="kpi-sub">${sub}</div>` : ""}
+    </div>`;
+}
+
+/* ---------------- View: Control Tower ---------------- */
+
+function renderTower(d) {
+  const k = d.kpis;
+  const topCorridors = d.revenue_by_corridor.slice(0, 6);
+  const maxRev = Math.max(...topCorridors.map(c => c.revenue), 1);
+  const board = d.active_loads_board;
+
+  return `
+    <div class="view-head">
+      <div>
+        <h1>Freight Control Tower</h1>
+        <p>Live operations summary across the Gedion network — loads, fleet, revenue, and risk in one view.</p>
+      </div>
+    </div>
+
+    <div class="grid grid-4" style="margin-bottom:16px;">
+      ${kpiCard("Total loads (12 mo)", fmtNum(k.total_loads))}
+      ${kpiCard("Revenue in flight", fmtZAR(k.total_revenue_zar), "delivered + in-transit", "amber")}
+      ${kpiCard("On-time delivery", fmtPct(k.on_time_pct), "", k.on_time_pct >= 80 ? "success" : "danger")}
+      ${kpiCard("Fleet utilisation", fmtPct(k.fleet_utilisation_pct), `${k.active_trucks} / ${k.total_trucks} trucks active`, "teal")}
+    </div>
+
+    <div class="two-col" style="margin-bottom:16px;">
+      ${panel("Revenue by corridor (top 6)", `<div class="barlist">${
+        topCorridors.map(c => barRow(c.corridor, c.revenue, maxRev, fmtZAR, c.risk_rating === "High" ? "amber" : "")).join("")
+      }</div>`, "ZAR")}
+
+      ${panel("Network risk", `
+        <div class="grid grid-2" style="gap:12px;">
+          ${kpiCard("Open security incidents", fmtNum(k.open_incidents), "unresolved right now", k.open_incidents > 0 ? "danger" : "success")}
+          ${kpiCard("Empty return rate", fmtPct(k.empty_return_pct), "AI dispatch target < 20%", k.empty_return_pct > 20 ? "danger" : "success")}
+        </div>
+      `)}
+    </div>
+
+    ${panel("In transit / delayed — live board", `
+      <table class="data">
+        <thead><tr><th>Load</th><th>Corridor</th><th>Cargo</th><th>Transporter</th><th>Truck</th><th>Status</th><th>ETA</th></tr></thead>
+        <tbody>
+          ${board.map(r => `
+            <tr>
+              <td>#${r.load_id}</td>
+              <td>${esc(r.corridor)}</td>
+              <td>${esc(r.cargo)}</td>
+              <td>${esc(r.transporter)}</td>
+              <td>${esc(r.truck || "—")}</td>
+              <td><span class="pill status-${r.status}">${esc(r.status)}</span></td>
+              <td>${esc(r.eta)}</td>
+            </tr>`).join("")}
+        </tbody>
+      </table>
+    `, `${board.length} active`)}
+  `;
+}
+
+/* ---------------- View: Marketplace ---------------- */
+
+function renderMarketplace(d) {
+  const board = d.active_loads_board;
+  const subs = d.subscriptions_by_tier;
+  const maxSub = Math.max(...subs.map(s => s.mrr), 1);
+
+  return `
+    <div class="view-head">
+      <div>
+        <h1>Freight Marketplace</h1>
+        <p>Uber-style load matching — customers post loads, transporters bid and accept.</p>
+      </div>
+    </div>
+
+    <div class="grid grid-3" style="margin-bottom:16px;">
+      ${kpiCard("Active customers", fmtNum(d.kpis.active_customers))}
+      ${kpiCard("Monthly recurring revenue", fmtZAR(d.kpis.mrr_zar), "across all plan tiers", "amber")}
+      ${kpiCard("Avg load value", fmtZAR(d.kpis.total_revenue_zar / Math.max(d.kpis.total_loads, 1)))}
+    </div>
+
+    <div class="two-col">
+      ${panel("Open load board (sample)", `
+        <div class="grid grid-2" style="gap:10px;">
+          ${board.slice(0, 8).map(r => `
+            <div class="mp-card">
+              <div class="route">${esc(r.corridor)}</div>
+              <div class="cargo">${esc(r.cargo)}</div>
+              <div class="meta"><span>${esc(r.transporter)}</span><span class="pill status-${r.status}">${esc(r.status)}</span></div>
+            </div>`).join("")}
+        </div>
+      `)}
+
+      ${panel("Subscription plan mix", `<div class="barlist">${
+        subs.map(s => barRow(`${s.plan_tier} (${s.subscribers})`, s.mrr, maxSub, fmtZAR, "amber")).join("")
+      }</div>`, "MRR")}
+    </div>
+  `;
+}
+
+/* ---------------- View: Fleet & Fuel ---------------- */
+
+function renderFleet(d) {
+  const fleets = d.fleet_by_transporter;
+  const maxFleet = Math.max(...fleets.map(f => f.fleet_size), 1);
+  const empty = d.empty_return_by_transporter;
+
+  return `
+    <div class="view-head">
+      <div>
+        <h1>Real-Time Fleet Tracking</h1>
+        <p>Fleet status, utilisation, and AI dispatch efficiency by transporter.</p>
+      </div>
+    </div>
+
+    <div class="grid grid-4" style="margin-bottom:16px;">
+      ${kpiCard("Active trucks", fmtNum(d.kpis.active_trucks), "", "teal")}
+      ${kpiCard("Total fleet size", fmtNum(d.kpis.total_trucks))}
+      ${kpiCard("Fleet utilisation", fmtPct(d.kpis.fleet_utilisation_pct), "", "success")}
+      ${kpiCard("Empty return rate", fmtPct(d.kpis.empty_return_pct), "AI dispatch KPI", d.kpis.empty_return_pct > 20 ? "danger" : "success")}
+    </div>
+
+    <div class="two-col">
+      ${panel("Fleet size by transporter", `<div class="barlist">${
+        fleets.map(f => barRow(f.transporter, f.fleet_size, maxFleet, fmtNum)).join("")
+      }</div>`)}
+
+      ${panel("Fleet status breakdown", `
+        <table class="data">
+          <thead><tr><th>Transporter</th><th>Active</th><th>Idle</th><th>Maint.</th><th>Rating</th></tr></thead>
+          <tbody>
+            ${fleets.map(f => `
+              <tr>
+                <td>${esc(f.transporter)}</td>
+                <td>${f.active}</td>
+                <td>${f.idle}</td>
+                <td>${f.maintenance}</td>
+                <td>★ ${f.rating}</td>
+              </tr>`).join("")}
+          </tbody>
+        </table>
+      `)}
+    </div>
+
+    <div style="height:16px"></div>
+    ${panel("Empty return % by transporter (lower is better)", `<div class="barlist">${
+      empty.map(e => barRow(e.transporter, e.empty_return_pct, 100, fmtPct, e.empty_return_pct > 25 ? "danger" : "")).join("")
+    }</div>`)}
+  `;
+}
+
+/* ---------------- View: Corridors ---------------- */
+
+function renderCorridors(d) {
+  const onTime = d.on_time_by_corridor;
+
+  return `
+    <div class="view-head">
+      <div>
+        <h1>South African Freight Corridors</h1>
+        <p>Durban–Johannesburg, Cape Town–Johannesburg, N3/N4 corridors, and SADC cross-border routes.</p>
+      </div>
+    </div>
+
+    ${panel("On-time delivery % by corridor", `
+      <table class="data">
+        <thead><tr><th>Corridor</th><th>Deliveries</th><th>On-time %</th></tr></thead>
+        <tbody>
+          ${onTime.map(c => `
+            <tr>
+              <td>${esc(c.corridor)}</td>
+              <td>${c.deliveries}</td>
+              <td>
+                <div class="barrow" style="grid-template-columns: 1fr 60px;">
+                  <div class="track"><div class="fill ${c.on_time_pct < 75 ? "danger" : ""}" style="width:${c.on_time_pct}%"></div></div>
+                  <div class="val">${fmtPct(c.on_time_pct)}</div>
+                </div>
+              </td>
+            </tr>`).join("")}
+        </tbody>
+      </table>
+    `)}
+  `;
+}
+
+/* ---------------- View: Cross-Border ---------------- */
+
+function renderBorder(d) {
+  const borders = d.border_performance;
+  const maxWait = Math.max(...borders.map(b => b.avg_wait_hours), 1);
+
+  return `
+    <div class="view-head">
+      <div>
+        <h1>Cross-Border Module</h1>
+        <p>Botswana · Namibia · Zimbabwe · Mozambique · Zambia · Lesotho · Eswatini — customs, permits, and border wait intelligence.</p>
+      </div>
+    </div>
+
+    <div class="two-col">
+      ${panel("Average wait time by border post", `<div class="barlist">${
+        borders.map(b => barRow(`${b.border} (${b.country})`, b.avg_wait_hours, maxWait, (v) => v.toFixed(1) + "h", b.avg_wait_hours > 5 ? "danger" : "")).join("")
+      }</div>`)}
+
+      ${panel("Customs clearance performance", `
+        <table class="data">
+          <thead><tr><th>Border post</th><th>Crossings</th><th>Cleared %</th></tr></thead>
+          <tbody>
+            ${borders.map(b => `
+              <tr><td>${esc(b.border)}</td><td>${b.crossings}</td><td>${fmtPct(b.customs_cleared_pct)}</td></tr>`).join("")}
+          </tbody>
+        </table>
+      `)}
+    </div>
+  `;
+}
+
+/* ---------------- View: Security ---------------- */
+
+function renderSecurity(d) {
+  const inc = d.incidents_by_corridor;
+  const maxInc = Math.max(...inc.map(i => i.incidents), 1);
+  const feed = d.recent_incidents;
+
+  return `
+    <div class="view-head">
+      <div>
+        <h1>Security Intelligence Layer</h1>
+        <p>Route risk scoring, theft hotspots, and driver verification across the network.</p>
+      </div>
+    </div>
+
+    <div class="grid grid-3" style="margin-bottom:16px;">
+      ${kpiCard("Open incidents", fmtNum(d.kpis.open_incidents), "", d.kpis.open_incidents > 0 ? "danger" : "success")}
+      ${kpiCard("Corridors flagged high-risk", fmtNum(inc.filter(i => i.risk_rating === "High").length))}
+      ${kpiCard("Total incidents logged", fmtNum(inc.reduce((a, i) => a + i.incidents, 0)))}
+    </div>
+
+    <div class="two-col">
+      ${panel("Theft & incident hotspots", `<div class="barlist">${
+        inc.map(i => barRow(`${i.corridor}`, i.incidents, maxInc, fmtNum, i.risk_rating === "High" ? "danger" : "amber")).join("")
+      }</div>`, "incidents")}
+
+      ${panel("Recent incident feed", `
+        <div class="feed">
+          ${feed.map(f => `
+            <div class="feed-item">
+              <div class="date">${esc(f.date)}</div>
+              <div class="type">
+                <span class="feed-dot ${f.resolved ? "resolved" : "open"}"></span>${esc(f.type)}
+                <small>${esc(f.corridor)} · ${esc(f.truck || "—")}</small>
+              </div>
+              <div>${f.resolved ? '<span class="pill status-Delivered">Resolved</span>' : '<span class="pill status-Delayed">Open</span>'}</div>
+            </div>`).join("")}
+        </div>
+      `)}
+    </div>
+  `;
+}
+
+/* ---------------- View: Revenue ---------------- */
+
+function renderRevenue(d) {
+  const monthly = d.monthly_revenue;
+  const maxMonth = Math.max(...monthly.map(m => m.invoiced), 1);
+  const byIndustry = d.revenue_by_industry;
+  const maxInd = Math.max(...byIndustry.map(i => i.revenue), 1);
+
+  return `
+    <div class="view-head">
+      <div>
+        <h1>Revenue &amp; Industry Mix</h1>
+        <p>Invoicing, collections, and revenue concentration across mining, agriculture, retail, and manufacturing.</p>
+      </div>
+    </div>
+
+    ${panel("Monthly invoiced vs collected (ZAR)", `<div class="barlist">${
+      monthly.map(m => barRow(m.month, m.invoiced, maxMonth, fmtZAR)).join("")
+    }</div>`)}
+
+    <div style="height:16px"></div>
+
+    ${panel("Revenue by industry", `<div class="barlist">${
+      byIndustry.map(i => barRow(`${i.industry} (${i.customers} cust.)`, i.revenue, maxInd, fmtZAR, "amber")).join("")
+    }</div>`)}
+  `;
+}
+
+/* ---------------- Router / boot ---------------- */
+
+const VIEWS = {
+  tower: renderTower,
+  marketplace: renderMarketplace,
+  fleet: renderFleet,
+  corridors: renderCorridors,
+  border: renderBorder,
+  security: renderSecurity,
+  revenue: renderRevenue,
+};
+
+function showView(name) {
+  const app = document.getElementById("app");
+  app.innerHTML = `<div class="view active">${VIEWS[name](window.GFI_DATA)}</div>`;
+  document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.view === name));
+}
+
+document.getElementById("tabs").addEventListener("click", (e) => {
+  const btn = e.target.closest(".tab");
+  if (!btn) return;
+  showView(btn.dataset.view);
+});
+
+function tickClock() {
+  const el = document.getElementById("clock");
+  const now = new Date();
+  el.textContent = now.toLocaleTimeString("en-ZA", { hour12: false });
+}
+setInterval(tickClock, 1000);
+tickClock();
+
+document.getElementById("last-refresh").textContent =
+  "Snapshot generated by analysis.py";
+
+if (!window.GFI_DATA) {
+  document.getElementById("app").innerHTML = `
+    <div class="panel">
+      <div class="panel-title">Data not found</div>
+      <p class="muted">Run <code>python generate_data.py</code> then <code>python analysis.py</code> in the /python folder,
+      then reopen index.html. This regenerates web/data.js.</p>
+    </div>`;
+} else {
+  showView("tower");
+}
+
+</script>
+</body>
+</html>

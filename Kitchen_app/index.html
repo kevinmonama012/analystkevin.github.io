@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kitchen Profit SA</title>
+<style>
+  :root{
+    --ink:#211D17; --parchment:#F6F2E9; --ochre:#C6811F; --ochre-dark:#8F5C13;
+    --forest:#2E4A34; --forest-dark:#1D2F21; --clay:#A8442E; --clay-dark:#6E2A1B;
+    --line:#DED4BE; --card:#FFFFFF; --muted:#6B6153; --input:#FCFAF5;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; font-family:Georgia, 'Times New Roman', serif; background:var(--parchment); color:var(--ink);}
+  body, input, select, button{font-family:-apple-system, Segoe UI, Inter, Arial, sans-serif;}
+  .serif{font-family:Georgia, 'Times New Roman', serif;}
+  .wrap{max-width:480px; margin:0 auto; padding-bottom:90px; min-height:100vh;}
+  header{padding:22px 18px 16px; border-bottom:1px solid var(--line); background:var(--parchment); position:sticky; top:0; z-index:5;}
+  header .title{font-family:Georgia, serif; font-weight:700; font-size:24px;}
+  header .tag{font-size:13px; color:#8A7F6D; margin-top:2px;}
+  main{padding:18px 18px 0;}
+  h2.section{font-family:Georgia, serif; font-weight:700; font-size:21px; margin:0 0 3px;}
+  p.sub{font-size:13px; color:var(--muted); margin:0 0 14px;}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px; margin-bottom:14px;}
+  .card.dark{background:var(--ink); border:none; color:#fff;}
+  .card.forest{background:var(--forest-dark); border:none; color:#fff;}
+  .card.ochre{background:var(--ochre-dark); border:none; color:#fff;}
+  label.field{display:block; margin-bottom:12px;}
+  label.field span{font-size:12px; color:var(--muted); font-weight:600; display:block; margin-bottom:4px;}
+  input, select{width:100%; border:1px solid var(--line); border-radius:8px; padding:9px 10px; font-size:15px; color:var(--ink); background:var(--input);}
+  .row{display:flex; gap:8px; margin-bottom:8px; align-items:center;}
+  .row input{flex:1;}
+  .row input.narrow{flex:0 0 78px;}
+  .btn-remove{border:none; background:transparent; color:var(--clay); font-size:18px; cursor:pointer; padding:0 2px;}
+  .btn-add{width:100%; padding:9px 0; border:1px dashed var(--line); border-radius:8px; background:transparent; color:var(--ochre-dark); font-weight:600; font-size:13px; cursor:pointer;}
+  .btn-add:hover{background:#FBF4E7;}
+  .stat-grid{display:flex; gap:12px;}
+  .stat{flex:1; min-width:0;}
+  .stat .lbl{font-size:11px; color:#8A7F6D; font-weight:600; text-transform:uppercase; letter-spacing:.4px;}
+  .stat .lbl.light{color:#AEC0AE;}
+  .stat .val{font-family:Georgia, serif; font-weight:700; font-size:22px; margin-top:2px;}
+  .stat .val.light{color:#fff;}
+  .tone-clay{color:var(--clay-dark);}
+  .tone-forest{color:var(--forest-dark);}
+  .pill-row{display:flex; gap:8px; margin-bottom:10px;}
+  .pill{flex:1; padding:9px 0; border-radius:8px; border:1px solid var(--line); background:var(--input); color:var(--ink); font-weight:600; font-size:14px; cursor:pointer; text-align:center;}
+  .pill.active{background:var(--ochre); border-color:var(--ochre-dark); color:#fff;}
+  .pill.active.forest-pill{background:var(--forest); border-color:var(--forest-dark);}
+  .low-alert{margin-top:8px; font-size:13px; color:var(--clay-dark); font-weight:600;}
+  .card.low{border-color:var(--clay); background:#FBF0EC;}
+  nav.tabs{position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid var(--line); display:flex; max-width:480px; margin:0 auto;}
+  nav.tabs button{flex:1; border:none; background:transparent; padding:12px 4px 10px; cursor:pointer; color:#9A8F7C; font-weight:500; font-size:11px; border-top:2px solid transparent;}
+  nav.tabs button.active{color:var(--ochre-dark); font-weight:700; border-top:2px solid var(--ochre);}
+  .tabpanel{display:none;}
+  .tabpanel.active{display:block;}
+  .hint{font-size:12px; color:#AEC0AE; margin-top:10px;}
+  .hint.dark{color:#C9D6C9;}
+  table.supplier{width:100%; border-collapse:collapse; font-size:13px;}
+  table.supplier th, table.supplier td{text-align:left; padding:6px 4px; border-bottom:1px solid var(--line);}
+  table.supplier th{color:var(--muted); font-weight:600; font-size:11px; text-transform:uppercase;}
+  .best{color:var(--forest-dark); font-weight:700;}
+  .planner-item{display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--line);}
+  .planner-item:last-child{border-bottom:none;}
+  .badge{font-size:11px; background:#F1E9D8; color:var(--ochre-dark); padding:2px 8px; border-radius:20px; font-weight:600;}
+  .ai-box textarea{width:100%; border:1px solid var(--line); border-radius:8px; padding:9px 10px; font-size:15px; background:var(--input); resize:vertical; min-height:64px; font-family:inherit;}
+  .ai-result{margin-top:12px;}
+  .empty{font-size:13px; color:var(--muted); text-align:center; padding:18px 0;}
+  .footer-note{font-size:11px; color:#AEA48F; text-align:center; padding:16px 18px 0;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="title">Kitchen Profit SA</div>
+    <div class="tag">Know your cost. Grow your business. &middot; Works fully offline</div>
+  </header>
+
+  <main>
+
+    <!-- RECIPE TAB -->
+    <section class="tabpanel active" id="tab-recipe">
+      <h2 class="section">Recipe cost calculator</h2>
+      <p class="sub">Add every ingredient's cost for the batch you're costing.</p>
+      <div class="card">
+        <label class="field"><span>Recipe name</span>
+          <input id="recipeName" placeholder="Chocolate muffins">
+        </label>
+        <span style="font-size:12px; color:var(--muted); font-weight:600; display:block; margin-bottom:6px;">Ingredients</span>
+        <div id="ingredientList"></div>
+        <button class="btn-add" onclick="addIngredient()">+ Add ingredient</button>
+        <div style="margin-top:14px;">
+          <label class="field"><span>Batch makes (servings/items)</span>
+            <input id="yieldCount" type="number" inputmode="numeric" placeholder="24">
+          </label>
+        </div>
+      </div>
+      <div class="card forest">
+        <div class="stat-grid">
+          <div class="stat"><div class="lbl light">Total batch cost</div><div class="val light" id="totalCostOut">R0.00</div></div>
+          <div class="stat"><div class="lbl light">Cost per item</div><div class="val light" id="costPerItemOut">R0.00</div></div>
+        </div>
+        <div class="hint dark" id="recipeSummary"></div>
+      </div>
+    </section>
+
+    <!-- PRICE TAB -->
+    <section class="tabpanel" id="tab-price">
+      <h2 class="section">Selling price calculator</h2>
+      <p class="sub">Turn your cost per item into a fair, profitable price.</p>
+      <div class="card">
+        <label class="field"><span>Cost per item (auto-filled from Recipe)</span>
+          <input id="priceCostInput" type="number" inputmode="decimal">
+        </label>
+        <span style="font-size:12px; color:var(--muted); font-weight:600; display:block; margin-bottom:8px;">Markup</span>
+        <div class="pill-row" id="markupPills">
+          <button class="pill" data-markup="30" onclick="setMarkup(30)">30%</button>
+          <button class="pill" data-markup="50" onclick="setMarkup(50)">50%</button>
+          <button class="pill" data-markup="100" onclick="setMarkup(100)">100%</button>
+        </div>
+        <div class="row">
+          <button class="pill" style="flex:0 0 90px;" id="customBtn" onclick="setMarkup('custom')">Custom</button>
+          <input id="customMarkup" type="number" inputmode="decimal" placeholder="e.g. 65">
+          <span>%</span>
+        </div>
+      </div>
+      <div class="card ochre">
+        <div class="stat-grid">
+          <div class="stat"><div class="lbl light">Selling price</div><div class="val light" id="sellingPriceOut">R0.00</div></div>
+          <div class="stat"><div class="lbl light">Profit per item</div><div class="val light" id="profitPerItemOut">R0.00</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROFIT TAB -->
+    <section class="tabpanel" id="tab-profit">
+      <h2 class="section">Profit calculator</h2>
+      <p class="sub">See what a batch actually earns you, VAT included.</p>
+      <div class="card">
+        <div class="row">
+          <label class="field" style="flex:1;"><span>Units sold</span>
+            <input id="unitsSold" type="number" inputmode="numeric" placeholder="24">
+          </label>
+          <label class="field" style="flex:1;"><span>Selling price / unit</span>
+            <input id="profitPrice" type="number" inputmode="decimal">
+          </label>
+        </div>
+        <span style="font-size:12px; color:var(--muted); font-weight:600; display:block; margin-bottom:8px;">South African VAT mode</span>
+        <div class="pill-row">
+          <button class="pill forest-pill active" data-vat="none" onclick="setVat('none')" style="font-size:12px;">No VAT</button>
+          <button class="pill forest-pill" data-vat="inclusive" onclick="setVat('inclusive')" style="font-size:12px;">VAT inclusive</button>
+          <button class="pill forest-pill" data-vat="exclusive" onclick="setVat('exclusive')" style="font-size:12px;">VAT exclusive</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="stat-grid" style="margin-bottom:12px;">
+          <div class="stat"><div class="lbl">Revenue</div><div class="val" id="revenueOut">R0.00</div></div>
+          <div class="stat"><div class="lbl">Cost</div><div class="val tone-clay" id="profitCostOut">R0.00</div></div>
+          <div class="stat"><div class="lbl">Profit</div><div class="val tone-forest" id="profitOut">R0.00</div></div>
+        </div>
+        <div id="vatLine" style="display:none; border-top:1px solid var(--line); padding-top:10px; font-size:13px; color:var(--muted);"></div>
+      </div>
+    </section>
+
+    <!-- INVENTORY TAB -->
+    <section class="tabpanel" id="tab-inventory">
+      <h2 class="section">Inventory tracking</h2>
+      <p class="sub">Track stock on hand and get warned before you run out.</p>
+      <div id="inventoryList"></div>
+      <button class="btn-add" onclick="addInventoryItem()">+ Add stock item</button>
+    </section>
+
+    <!-- SUPPLIERS TAB -->
+    <section class="tabpanel" id="tab-suppliers">
+      <h2 class="section">Pretoria supplier compare</h2>
+      <p class="sub">Local reference prices. Edit anytime to keep them current.</p>
+      <div class="card">
+        <div class="row">
+          <input id="supplierItem" placeholder="Item, e.g. Cake flour 2.5kg">
+        </div>
+        <div class="row">
+          <input id="supplierMakro" class="narrow" type="number" placeholder="Makro">
+          <input id="supplierCheckers" class="narrow" type="number" placeholder="Checkers">
+          <input id="supplierShoprite" class="narrow" type="number" placeholder="Shoprite">
+          <input id="supplierPnp" class="narrow" type="number" placeholder="PnP">
+        </div>
+        <button class="btn-add" onclick="addSupplierRow()">+ Add item to compare</button>
+      </div>
+      <div class="card">
+        <table class="supplier" id="supplierTable">
+          <thead><tr><th>Item</th><th>Makro</th><th>Checkers</th><th>Shoprite</th><th>PnP</th></tr></thead>
+          <tbody id="supplierBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- PLANNER TAB -->
+    <section class="tabpanel" id="tab-planner">
+      <h2 class="section">Baking planner</h2>
+      <p class="sub">Orders, deliveries, practicals and markets in one list.</p>
+      <div class="card">
+        <div class="row">
+          <input id="plannerTitle" placeholder="What's happening">
+        </div>
+        <div class="row">
+          <input id="plannerDate" type="date">
+          <select id="plannerType">
+            <option>Order</option>
+            <option>Delivery</option>
+            <option>School practical</option>
+            <option>Community market</option>
+          </select>
+        </div>
+        <button class="btn-add" onclick="addPlannerItem()">+ Add to planner</button>
+      </div>
+      <div class="card" id="plannerCard">
+        <div id="plannerList"></div>
+      </div>
+    </section>
+
+    <!-- AI ASSISTANT TAB -->
+    <section class="tabpanel" id="tab-ai">
+      <h2 class="section">Batch cost estimator</h2>
+      <p class="sub">Offline estimate based on your saved recipes and typical ratios. Not a live AI &mdash; a quick planning tool.</p>
+      <div class="card ai-box">
+        <label class="field"><span>What do you want to bake?</span>
+          <textarea id="aiInput" placeholder="I want to bake 50 chocolate cupcakes."></textarea>
+        </label>
+        <button class="btn-add" onclick="runEstimate()">Estimate cost and price</button>
+        <div class="ai-result" id="aiResult"></div>
+      </div>
+    </section>
+
+    <!-- DASHBOARD TAB -->
+    <section class="tabpanel" id="tab-dashboard">
+      <h2 class="section">Business dashboard</h2>
+      <p class="sub">A snapshot of how the business is doing.</p>
+      <div class="card">
+        <div class="row">
+          <label class="field" style="flex:1;"><span>Revenue this period</span>
+            <input id="dashRevenue" type="number" inputmode="decimal">
+          </label>
+          <label class="field" style="flex:1;"><span>Costs this period</span>
+            <input id="dashCosts" type="number" inputmode="decimal">
+          </label>
+        </div>
+        <label class="field"><span>Best-selling product</span>
+          <input id="dashBestSeller" placeholder="Chocolate muffins">
+        </label>
+      </div>
+      <div class="card dark">
+        <div class="stat-grid" style="margin-bottom:12px;">
+          <div class="stat"><div class="lbl light">Revenue</div><div class="val light" id="dashRevenueOut">R0.00</div></div>
+          <div class="stat"><div class="lbl light">Costs</div><div class="val light" id="dashCostsOut">R0.00</div></div>
+        </div>
+        <div class="stat-grid">
+          <div class="stat"><div class="lbl light">Profit</div><div class="val light" id="dashProfitOut">R0.00</div></div>
+          <div class="stat"><div class="lbl light">Margin</div><div class="val light" id="dashMarginOut">0%</div></div>
+        </div>
+      </div>
+    </section>
+
+    <p class="footer-note">All data is saved on this computer only, in this browser. Nothing is sent to the internet.</p>
+  </main>
+</div>
+
+<nav class="tabs">
+  <button class="active" data-tab="recipe" onclick="showTab('recipe')">Recipe</button>
+  <button data-tab="price" onclick="showTab('price')">Price</button>
+  <button data-tab="profit" onclick="showTab('profit')">Profit</button>
+  <button data-tab="inventory" onclick="showTab('inventory')">Stock</button>
+  <button data-tab="suppliers" onclick="showTab('suppliers')">Suppliers</button>
+  <button data-tab="planner" onclick="showTab('planner')">Planner</button>
+  <button data-tab="ai" onclick="showTab('ai')">Estimate</button>
+  <button data-tab="dashboard" onclick="showTab('dashboard')">Dashboard</button>
+</nav>
+
+<script>
+/* ---------- storage ---------- */
+const STORE_KEY = "kitchenProfitSA_v1";
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORE_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){}
+  return null;
+}
+function saveState(){
+  localStorage.setItem(STORE_KEY, JSON.stringify(state));
+}
+
+let idSeq = 1;
+const newId = () => idSeq++;
+
+let state = loadState() || {
+  recipe: {
+    name: "Chocolate muffins",
+    yieldCount: "24",
+    ingredients: [
+      { id: newId(), name: "Flour, 2kg", cost: "35" },
+      { id: newId(), name: "Sugar, 1kg", cost: "22" },
+      { id: newId(), name: "Eggs, 12", cost: "48" },
+      { id: newId(), name: "Butter, 500g", cost: "65" }
+    ]
+  },
+  pricing: { markup: 50, custom: false, customValue: "", overrideCost: null },
+  vatMode: "none",
+  unitsSold: "24",
+  profitPrice: "",
+  inventory: [ { id: newId(), name: "Flour", qty: "2", unit: "kg", low: "3" } ],
+  suppliers: [
+    { id: newId(), item: "Cake flour 2.5kg", makro: "42", checkers: "45", shoprite: "44", pnp: "46" },
+    { id: newId(), item: "White sugar 2kg", makro: "38", checkers: "41", shoprite: "40", pnp: "42" }
+  ],
+  planner: [],
+  dashboard: { revenue: "4500", costs: "2100", bestSeller: "Chocolate muffins" }
+};
+// keep idSeq ahead of any loaded ids
+[...state.recipe.ingredients, ...state.inventory, ...state.suppliers, ...state.planner].forEach(o=>{ if(o && o.id >= idSeq) idSeq = o.id+1; });
+
+/* ---------- tabs ---------- */
+function showTab(name){
+  document.querySelectorAll('.tabpanel').forEach(el=>el.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.toggle('active', b.dataset.tab===name));
+  if(name==='price'){ syncPriceCostFromRecipe(); }
+  if(name==='profit'){ document.getElementById('profitPrice').value = document.getElementById('profitPrice').value || currentSellingPrice().toFixed(2); }
+}
+
+/* ---------- helpers ---------- */
+function fmt(n){ n = Number.isFinite(n) ? n : 0; return "R" + n.toFixed(2); }
+function num(v){ const n = parseFloat(v); return Number.isFinite(n) ? n : 0; }
+
+/* ---------- recipe tab ---------- */
+function renderIngredients(){
+  const list = document.getElementById('ingredientList');
+  list.innerHTML = "";
+  state.recipe.ingredients.forEach(ing=>{
+    const row = document.createElement('div');
+    row.className = 'row';
+    row.innerHTML = `
+      <input value="${escapeHtml(ing.name)}" placeholder="Flour, 2kg" oninput="updateIngredient(${ing.id},'name',this.value)">
+      <input class="narrow" type="number" inputmode="decimal" value="${escapeHtml(ing.cost)}" placeholder="Cost" oninput="updateIngredient(${ing.id},'cost',this.value)">
+      <button class="btn-remove" onclick="removeIngredient(${ing.id})">&times;</button>
+    `;
+    list.appendChild(row);
+  });
+}
+function updateIngredient(id, field, val){
+  const ing = state.recipe.ingredients.find(i=>i.id===id);
+  if(ing){ ing[field]=val; saveState(); recalcAll(); }
+}
+function addIngredient(){
+  state.recipe.ingredients.push({id:newId(), name:"", cost:""});
+  saveState(); renderIngredients(); recalcAll();
+}
+function removeIngredient(id){
+  state.recipe.ingredients = state.recipe.ingredients.filter(i=>i.id!==id);
+  saveState(); renderIngredients(); recalcAll();
+}
+function totalCost(){ return state.recipe.ingredients.reduce((s,i)=>s+num(i.cost),0); }
+function costPerItem(){ const y = num(state.recipe.yieldCount); return y>0 ? totalCost()/y : 0; }
+
+/* ---------- price tab ---------- */
+function syncPriceCostFromRecipe(){
+  if(state.pricing.overrideCost===null){
+    document.getElementById('priceCostInput').value = costPerItem().toFixed(2);
+  }
+}
+function effectiveCost(){
+  const ov = state.pricing.overrideCost;
+  return (ov!==null && ov!=="") ? num(ov) : costPerItem();
+}
+function currentMarkup(){
+  return state.pricing.custom ? num(state.pricing.customValue) : state.pricing.markup;
+}
+function currentSellingPrice(){
+  return effectiveCost() * (1 + currentMarkup()/100);
+}
+function setMarkup(m){
+  if(m==='custom'){ state.pricing.custom = true; }
+  else{ state.pricing.custom = false; state.pricing.markup = m; }
+  saveState(); renderPricePills(); recalcAll();
+}
+function renderPricePills(){
+  document.querySelectorAll('#markupPills .pill').forEach(btn=>{
+    btn.classList.toggle('active', !state.pricing.custom && Number(btn.dataset.markup)===state.pricing.markup);
+  });
+  document.getElementById('customBtn').classList.toggle('active', state.pricing.custom);
+}
+
+/* ---------- vat / profit tab ---------- */
+function setVat(mode){
+  state.vatMode = mode;
+  saveState();
+  document.querySelectorAll('[data-vat]').forEach(b=>b.classList.toggle('active', b.dataset.vat===mode));
+  recalcAll();
+}
+
+/* ---------- inventory ---------- */
+function renderInventory(){
+  const list = document.getElementById('inventoryList');
+  if(state.inventory.length===0){ list.innerHTML = '<p class="empty">No stock items yet.</p>'; return; }
+  list.innerHTML = "";
+  state.inventory.forEach(it=>{
+    const qty = num(it.qty), low = num(it.low);
+    const isLow = it.low!=="" && qty<=low;
+    const card = document.createElement('div');
+    card.className = 'card' + (isLow ? ' low' : '');
+    card.innerHTML = `
+      <div class="row">
+        <input value="${escapeHtml(it.name)}" placeholder="Ingredient name" oninput="updateInventory(${it.id},'name',this.value)">
+        <button class="btn-remove" onclick="removeInventory(${it.id})">&times;</button>
+      </div>
+      <div class="row">
+        <input type="number" inputmode="decimal" value="${escapeHtml(it.qty)}" placeholder="Qty on hand" oninput="updateInventory(${it.id},'qty',this.value)">
+        <select onchange="updateInventory(${it.id},'unit',this.value)">
+          ${['kg','g','l','ml','units'].map(u=>`<option value="${u}" ${it.unit===u?'selected':''}>${u}</option>`).join('')}
+        </select>
+        <input type="number" inputmode="decimal" value="${escapeHtml(it.low)}" placeholder="Low alert at" oninput="updateInventory(${it.id},'low',this.value)">
+      </div>
+      ${isLow ? `<div class="low-alert">Only ${qty} ${it.unit} ${it.name||'of this item'} remaining.</div>` : ''}
+    `;
+    list.appendChild(card);
+  });
+}
+function updateInventory(id, field, val){
+  const it = state.inventory.find(i=>i.id===id);
+  if(it){ it[field]=val; saveState(); renderInventory(); }
+}
+function addInventoryItem(){
+  state.inventory.push({id:newId(), name:"", qty:"", unit:"kg", low:""});
+  saveState(); renderInventory();
+}
+function removeInventory(id){
+  state.inventory = state.inventory.filter(i=>i.id!==id);
+  saveState(); renderInventory();
+}
+
+/* ---------- suppliers ---------- */
+function renderSuppliers(){
+  const body = document.getElementById('supplierBody');
+  if(state.suppliers.length===0){ body.innerHTML = '<tr><td colspan="5" class="empty">No items yet.</td></tr>'; return; }
+  body.innerHTML = "";
+  state.suppliers.forEach(row=>{
+    const prices = {makro:num(row.makro), checkers:num(row.checkers), shoprite:num(row.shoprite), pnp:num(row.pnp)};
+    const valid = Object.entries(prices).filter(([,v])=>v>0);
+    const min = valid.length ? Math.min(...valid.map(([,v])=>v)) : null;
+    const cell = (key,label)=>{
+      const v = prices[key];
+      const isBest = min!==null && v===min && v>0;
+      return `<td class="${isBest?'best':''}">${v>0? 'R'+v.toFixed(2) : '&mdash;'}</td>`;
+    };
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${escapeHtml(row.item)}</td>${cell('makro')}${cell('checkers')}${cell('shoprite')}${cell('pnp')}`;
+    body.appendChild(tr);
+  });
+}
+function addSupplierRow(){
+  const item = document.getElementById('supplierItem').value.trim();
+  if(!item) return;
+  state.suppliers.push({
+    id:newId(), item,
+    makro: document.getElementById('supplierMakro').value,
+    checkers: document.getElementById('supplierCheckers').value,
+    shoprite: document.getElementById('supplierShoprite').value,
+    pnp: document.getElementById('supplierPnp').value
+  });
+  ['supplierItem','supplierMakro','supplierCheckers','supplierShoprite','supplierPnp'].forEach(id=>document.getElementById(id).value="");
+  saveState(); renderSuppliers();
+}
+
+/* ---------- planner ---------- */
+function renderPlanner(){
+  const list = document.getElementById('plannerList');
+  if(state.planner.length===0){ list.innerHTML = '<p class="empty">Nothing scheduled yet.</p>'; return; }
+  const sorted = [...state.planner].sort((a,b)=> (a.date||'').localeCompare(b.date||''));
+  list.innerHTML = "";
+  sorted.forEach(p=>{
+    const row = document.createElement('div');
+    row.className = 'planner-item';
+    row.innerHTML = `
+      <div>
+        <div style="font-weight:600; font-size:14px;">${escapeHtml(p.title)}</div>
+        <div style="font-size:12px; color:var(--muted);">${p.date || 'No date'}</div>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span class="badge">${escapeHtml(p.type)}</span>
+        <button class="btn-remove" onclick="removePlanner(${p.id})">&times;</button>
+      </div>
+    `;
+    list.appendChild(row);
+  });
+}
+function addPlannerItem(){
+  const title = document.getElementById('plannerTitle').value.trim();
+  const date = document.getElementById('plannerDate').value;
+  const type = document.getElementById('plannerType').value;
+  if(!title) return;
+  state.planner.push({id:newId(), title, date, type});
+  document.getElementById('plannerTitle').value = "";
+  document.getElementById('plannerDate').value = "";
+  saveState(); renderPlanner();
+}
+function removePlanner(id){
+  state.planner = state.planner.filter(p=>p.id!==id);
+  saveState(); renderPlanner();
+}
+
+/* ---------- AI-style offline estimator ---------- */
+function runEstimate(){
+  const text = document.getElementById('aiInput').value.toLowerCase();
+  const qtyMatch = text.match(/(\d+)/);
+  const qty = qtyMatch ? parseInt(qtyMatch[1],10) : 24;
+  // use the current recipe's cost-per-item as the base rate, scaled by keyword hints
+  let baseCostPerItem = costPerItem() || 5;
+  if(text.includes('cupcake') || text.includes('muffin')) baseCostPerItem = baseCostPerItem || 5;
+  if(text.includes('cookie')) baseCostPerItem = Math.min(baseCostPerItem, 3.5) || 3.5;
+  if(text.includes('bread') || text.includes('loaf')) baseCostPerItem = 18;
+  if(text.includes('cake') && !text.includes('cupcake')) baseCostPerItem = 85;
+  const totalEst = baseCostPerItem * qty;
+  const price50 = baseCostPerItem * 1.5;
+  const price100 = baseCostPerItem * 2;
+  const profit50 = (price50 - baseCostPerItem) * qty;
+  const profit100 = (price100 - baseCostPerItem) * qty;
+
+  document.getElementById('aiResult').innerHTML = `
+    <div class="card" style="margin-top:0;">
+      <div class="stat-grid" style="margin-bottom:12px;">
+        <div class="stat"><div class="lbl">Estimated cost/item</div><div class="val">${fmt(baseCostPerItem)}</div></div>
+        <div class="stat"><div class="lbl">Estimated batch cost</div><div class="val">${fmt(totalEst)}</div></div>
+      </div>
+      <div style="border-top:1px solid var(--line); padding-top:10px; font-size:13px; color:var(--muted);">
+        <div>At 50% markup: sell at ${fmt(price50)} each &rarr; profit ${fmt(profit50)} on ${qty} units.</div>
+        <div style="margin-top:4px;">At 100% markup: sell at ${fmt(price100)} each &rarr; profit ${fmt(profit100)} on ${qty} units.</div>
+      </div>
+      <div style="margin-top:10px; font-size:11px; color:#AEA48F;">Based on your current recipe cost per item and simple keyword matching &mdash; refine in the Recipe tab for accuracy.</div>
+    </div>
+  `;
+}
+
+/* ---------- dashboard ---------- */
+function renderDashboard(){
+  document.getElementById('dashRevenue').value = state.dashboard.revenue;
+  document.getElementById('dashCosts').value = state.dashboard.costs;
+  document.getElementById('dashBestSeller').value = state.dashboard.bestSeller;
+  recalcDashboard();
+}
+function recalcDashboard(){
+  const revenue = num(state.dashboard.revenue), costs = num(state.dashboard.costs);
+  const profit = revenue - costs;
+  const margin = revenue>0 ? (profit/revenue)*100 : 0;
+  document.getElementById('dashRevenueOut').textContent = fmt(revenue);
+  document.getElementById('dashCostsOut').textContent = fmt(costs);
+  document.getElementById('dashProfitOut').textContent = fmt(profit);
+  document.getElementById('dashMarginOut').textContent = margin.toFixed(0)+"%";
+}
+
+/* ---------- master recalc ---------- */
+function recalcAll(){
+  document.getElementById('totalCostOut').textContent = fmt(totalCost());
+  document.getElementById('costPerItemOut').textContent = fmt(costPerItem());
+  const y = num(state.recipe.yieldCount);
+  document.getElementById('recipeSummary').textContent =
+    `${state.recipe.name || 'Your recipe'} makes ${y||0} ${y===1?'item':'items'} at ${fmt(costPerItem())} each.`;
+
+  syncPriceCostFromRecipe();
+  const sp = currentSellingPrice();
+  document.getElementById('sellingPriceOut').textContent = fmt(sp);
+  document.getElementById('profitPerItemOut').textContent = fmt(sp - effectiveCost());
+
+  const units = num(document.getElementById('unitsSold').value);
+  const price = num(document.getElementById('profitPrice').value);
+  const revenue = units*price;
+  const cost = units*effectiveCost();
+  let vatAmount = 0, netRevenue = revenue;
+  if(state.vatMode==='inclusive'){ vatAmount = revenue - revenue/1.15; netRevenue = revenue - vatAmount; }
+  else if(state.vatMode==='exclusive'){ vatAmount = revenue*0.15; netRevenue = revenue; }
+  const profit = netRevenue - cost;
+  document.getElementById('revenueOut').textContent = fmt(revenue);
+  document.getElementById('profitCostOut').textContent = fmt(cost);
+  document.getElementById('profitOut').textContent = fmt(profit);
+  const vatLine = document.getElementById('vatLine');
+  if(state.vatMode==='none'){ vatLine.style.display='none'; }
+  else{ vatLine.style.display='block'; vatLine.innerHTML = `VAT (${state.vatMode}) at 15%: <strong style="color:var(--ink)">${fmt(vatAmount)}</strong>`; }
+}
+
+function escapeHtml(s){
+  return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ---------- wire up inputs that write to state ---------- */
+function bind(id, path, fn){
+  const el = document.getElementById(id);
+  el.addEventListener('input', ()=>{ fn(el.value); saveState(); recalcAll(); });
+}
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  document.getElementById('recipeName').value = state.recipe.name;
+  document.getElementById('yieldCount').value = state.recipe.yieldCount;
+  bind('recipeName', null, v=>state.recipe.name=v);
+  bind('yieldCount', null, v=>state.recipe.yieldCount=v);
+  renderIngredients();
+
+  bind('priceCostInput', null, v=>state.pricing.overrideCost=v);
+  bind('customMarkup', null, v=>{ state.pricing.customValue=v; state.pricing.custom=true; renderPricePills(); });
+  renderPricePills();
+
+  bind('unitsSold', null, v=>state.unitsSold=v);
+  bind('profitPrice', null, v=>state.profitPrice=v);
+  document.getElementById('unitsSold').value = state.unitsSold;
+  document.getElementById('profitPrice').value = state.profitPrice;
+  document.querySelectorAll('[data-vat]').forEach(b=>b.classList.toggle('active', b.dataset.vat===state.vatMode));
+
+  renderInventory();
+  renderSuppliers();
+  renderPlanner();
+  renderDashboard();
+
+  bind('dashRevenue', null, v=>{state.dashboard.revenue=v; recalcDashboard();});
+  bind('dashCosts', null, v=>{state.dashboard.costs=v; recalcDashboard();});
+  bind('dashBestSeller', null, v=>state.dashboard.bestSeller=v);
+
+  recalcAll();
+});
+</script>
+</body>
+</html>
